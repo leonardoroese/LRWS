@@ -1,6 +1,7 @@
 package br.com.zpi.lrws;
 
 import android.content.Context;
+import br.com.zpi.lrws.tools.MIGBase64;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
