@@ -90,34 +90,40 @@ public class LRWS {
         }
     }
 
-	// ####################################################################
-	// Object Lin to JSON
-	// ####################################################################
-	public JSONObject lin2json(Object o, boolean encoded) {
-		if (o == null)
-			return null;
-		JSONObject jout = new JSONObject();
-		for (Field f : o.getClass().getDeclaredFields()) {
-			try {
-				if (f.get(o) != null && f.get(o).getClass().isArray()) {
-					JSONArray ao = lin2json((Object[]) f.get(o), true);
-					jout.put(f.getName(), ao);
-				} else {
-					String val = (String) f.get(o);
-					if (val != null)
-						if (encoded)
-							jout.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
-						else
-							jout.put(f.getName(), (String) f.get(o));
-					else
-						jout.put(f.getName(), "");
-				}
-			} catch (Exception e) {
-				jout.put(f.getName(), "");
-			}
-		}
-		return jout;
-	}
+    // ####################################################################
+    // Java Class(model) To JSON OBJECT CONVERTER
+    // ####################################################################
+
+    public JSONObject lin2json(Object o, boolean encoded) {
+        return lin2json(o, encoded, false);
+    }
+    public JSONObject lin2json(Object o, boolean encoded, boolean ignorenull) {
+        if (o == null)
+            return null;
+        JSONObject jout = new JSONObject();
+        for (Field f : o.getClass().getDeclaredFields()) {
+            try {
+                if (f.get(o) != null && f.get(o).getClass().isArray()) {
+                    JSONArray ao = lin2json((Object[]) f.get(o), encoded);
+                    jout.put(f.getName(), ao);
+                } else {
+                    String val = (String) f.get(o);
+                    if (val != null)
+                        if (encoded)
+                            jout.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
+                        else
+                            jout.put(f.getName(), f.get(o));
+                    else
+                        if(!ignorenull)
+                            jout.put(f.getName(), "");
+                }
+            } catch (Exception e) {
+
+            }
+        }
+        return jout;
+    }
+
 
 	// ####################################################################
 	// Object Lin to JSON Array

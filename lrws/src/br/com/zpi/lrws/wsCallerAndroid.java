@@ -1,6 +1,6 @@
 package br.com.zpi.lrws;
 
-import android.content.Context;
+/*import android.content.Context;
 import br.com.zpi.lrws.tools.MIGBase64;
 
 import org.apache.http.HttpResponse;
@@ -24,10 +24,10 @@ import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Iterator;*/
 
 public class wsCallerAndroid {
-
+/*
     public final static int METHOD_GET = 1;
     public final static int METHOD_POST = 2;
     public final static int METHOD_PUT = 3;
@@ -646,5 +646,5 @@ public class wsCallerAndroid {
         }
 
 
-    }
+    }*/
 }
