@@ -75,7 +75,7 @@ public abstract class ConBase {
 
 						}
 					}
-					query = query.replaceFirst("?", s);
+					query = query.replaceFirst("\\?", s);
 				}
 			}
 		}
@@ -134,7 +134,7 @@ public abstract class ConBase {
 
 						}
 					}
-					query = query.replaceFirst("?", s);
+					query = query.replaceFirst("\\?", s);
 				}
 			}
 		}

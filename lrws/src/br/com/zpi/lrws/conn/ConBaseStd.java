@@ -85,7 +85,7 @@ public abstract class ConBaseStd {
 
 						}
 					}
-					query = query.replaceFirst("?", s);
+					query = query.replaceFirst("\\?", s);
 				}
 			}
 		}
@@ -141,7 +141,7 @@ public abstract class ConBaseStd {
 
 						}
 					}
-					query = query.replaceFirst("?", s);
+					query = query.replaceFirst("\\?", s);
 				}
 			}
 		}
