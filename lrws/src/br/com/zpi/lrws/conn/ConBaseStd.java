@@ -60,7 +60,37 @@ public abstract class ConBaseStd {
 	}
 
 	public boolean updateDB(String query, String dbname) {
+		return updateDB(query, dbname, null, false);
+	}
+
+	public boolean updateDB(String query, String[] params, boolean encode) {
+		return updateDB(query, null, params, encode);
+	}
+
+	public boolean updateDB(String query, String dbname, String[] params, boolean encode) {
 		Connection connection = null;
+		
+		if (query == null || query.trim().length() <= 0) {
+			this.resType = "E";
+			this.resMsg = "Inform valid query";
+			return false;
+		}
+		if (params != null && params.length > 0) {
+			if (query.indexOf('?') > 0) {
+				for (String s : params) {
+					if (encode) {
+						try {
+							s = URLEncoder.encode(s, "UTF-8");
+						} catch (Exception e) {
+
+						}
+					}
+					query = query.replace("?", s);
+				}
+			}
+		}
+
+		
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = (Connection) DriverManager.getConnection("jdbc:mysql://" +dbHost + ":"
