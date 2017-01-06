@@ -85,7 +85,7 @@ public abstract class ConBaseStd {
 
 						}
 					}
-					query = query.replace("?", s);
+					query = query.replaceFirst("?", s);
 				}
 			}
 		}
@@ -114,13 +114,38 @@ public abstract class ConBaseStd {
 	// READ DB (MYSQL)
 	// ####################################################################
 	public ArrayList<DBLin> readDb(String query) {
-		return readDb(query, null);
+		return readDb(query, null, null, false);
 	}
 
-	public ArrayList<DBLin> readDb(String query, String dbname) {
+	public ArrayList<DBLin> readDb(String query, String[] params, boolean encode) {
+		return readDb(query, null, params, encode);
+	}
+	
+	public ArrayList<DBLin> readDb(String query, String dbname, String[] params, boolean encode) {
 		Connection connection = null;
 		ResultSet rs = null;
 		ArrayList<DBLin> outres = null;
+		
+		if (query == null || query.trim().length() <= 0) {
+			this.resType = "E";
+			this.resMsg = "Inform valid query";
+			return null;
+		}
+		if (params != null && params.length > 0) {
+			if (query.indexOf('?') > 0) {
+				for (String s : params) {
+					if (encode) {
+						try {
+							s = URLEncoder.encode(s, "UTF-8");
+						} catch (Exception e) {
+
+						}
+					}
+					query = query.replaceFirst("?", s);
+				}
+			}
+		}
+		
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			connection = (Connection) DriverManager.getConnection("jdbc:mysql://" +dbHost + ":"
