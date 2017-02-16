@@ -1,35 +1,24 @@
 package br.com.zpi.lrws.conn;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.ResultSetMetaData;
-import com.mysql.jdbc.Statement;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.*;
-import org.owasp.esapi.ESAPI;
-import org.owasp.esapi.codecs.MySQLCodec;
-import java.net.*;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.io.*;
+import org.jsoup.Jsoup;
 
 public abstract class ConBase {
 
@@ -122,7 +111,7 @@ public abstract class ConBase {
 
 			}
 			
-			Statement stmt = (Statement) connection.createStatement();
+			Statement stmt = connection.createStatement();
 			stmt.execute(query);
 			connection.close();
 
