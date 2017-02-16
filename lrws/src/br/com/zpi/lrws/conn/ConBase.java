@@ -35,10 +35,24 @@ public abstract class ConBase {
 
 	public String resType = null;
 	public String resMsg = null;
+	private int DBD = 1;
+	
 	private ServletConfig scontext = null;
+
+	private static final String MYSQLDRIVER = "com.mysql.jdbc.Driver";
+	private static final String POSTGRESQLDRIVER = "org.postgresql.Driver";
+	
+	public static final int DBD_MYSQL = 1;
+	public static final int DBD_POSTGRESQL = 2;
 
 	public ConBase(ServletConfig sconf) {
 		this.scontext = sconf;
+		this.DBD = 1;
+	}
+	
+	public ConBase(ServletConfig sconf, int DBD) {
+		this.scontext = sconf;
+		this.DBD = DBD;
 	}
 
 	// ####################################################################
@@ -83,10 +97,31 @@ public abstract class ConBase {
 		if (dbname == null)
 			dbname = ctx.getInitParameter("dbName");
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
-					+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-					ctx.getInitParameter("dbPass"));
+			
+			switch(DBD){
+				case 1:
+					Class.forName(MYSQLDRIVER);
+					connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
+							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+							ctx.getInitParameter("dbPass"));
+					break;
+					
+				case 2:
+					Class.forName(POSTGRESQLDRIVER);
+					connection = (Connection) DriverManager.getConnection("jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
+							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+							ctx.getInitParameter("dbPass"));
+					break;
+			
+				default:
+					Class.forName(MYSQLDRIVER);
+					connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
+							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+							ctx.getInitParameter("dbPass"));
+					break;
+
+			}
+			
 			Statement stmt = (Statement) connection.createStatement();
 			stmt.execute(query);
 			connection.close();
@@ -142,10 +177,31 @@ public abstract class ConBase {
 		if (dbname == null)
 			dbname = ctx.getInitParameter("dbName");
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
-					+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-					ctx.getInitParameter("dbPass"));
+
+			switch(DBD){
+			case 1:
+				Class.forName(MYSQLDRIVER);
+				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
+						+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						ctx.getInitParameter("dbPass"));
+				break;
+				
+			case 2:
+				Class.forName(POSTGRESQLDRIVER);
+				connection = (Connection) DriverManager.getConnection("jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
+						+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						ctx.getInitParameter("dbPass"));
+				break;
+		
+			default:
+				Class.forName(MYSQLDRIVER);
+				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
+						+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						ctx.getInitParameter("dbPass"));
+				break;
+
+		}
+		
 			Statement stmt = (Statement) connection.createStatement();
 			rs = stmt.executeQuery(query);
 			if (rs != null) {
