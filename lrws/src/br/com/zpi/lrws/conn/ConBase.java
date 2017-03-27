@@ -86,13 +86,15 @@ public abstract class ConBase {
 		if (dbname == null)
 			dbname = ctx.getInitParameter("dbName");
 		try {
-			
+			Statement stmt = null;
 			switch(DBD){
 				case 1:
 					Class.forName(MYSQLDRIVER);
 					connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
 							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
 							ctx.getInitParameter("dbPass"));
+					stmt = connection.createStatement();
+					stmt.execute(query);
 					break;
 					
 				case 2:
@@ -100,6 +102,9 @@ public abstract class ConBase {
 					connection = (Connection) DriverManager.getConnection("jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
 							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
 							ctx.getInitParameter("dbPass"));
+					connection.setAutoCommit(true);
+					stmt = connection.createStatement();
+					stmt.executeQuery(query);
 					break;
 			
 				default:
@@ -107,12 +112,12 @@ public abstract class ConBase {
 					connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
 							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
 							ctx.getInitParameter("dbPass"));
+					stmt = connection.createStatement();
+					stmt.execute(query);
 					break;
 
 			}
 			
-			Statement stmt = connection.createStatement();
-			stmt.execute(query);
 			connection.close();
 
 			this.resType = "S";
