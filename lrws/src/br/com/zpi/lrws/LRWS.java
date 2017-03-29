@@ -17,7 +17,7 @@ public class LRWS {
 
     private LRWSConverter converter = new LRWSConverter();
 
-    public Object[] callArray(String classname, String arrayparam, String wshost, String wsname, ArrayList<linParams> params, int method) throws LRWSException{
+    public Object[] callArray(String classname, String arrayparam, String wshost, String wsname, String[][] params, JSONObject jso, boolean encoded, int method) throws LRWSException{
         LRWSException e = new LRWSException();
 
         if(classname == null || classname.trim().length() <= 0){
@@ -26,13 +26,13 @@ public class LRWS {
         }
 
         LRWSConnector ws = new LRWSConnector();
-        String callres = ws.callWSAS(wshost, wsname, params, method);
+        String callres = ws.callWSAS(wshost, wsname, params, jso, encoded, method);
         if (callres != null && callres.trim().indexOf("[") >= 0) {
                 try {
                         JSONArray jsa = null;
                         if(arrayparam != null && arrayparam.trim().length() > 0){
-                            JSONObject jso = new JSONObject(callres);
-                            if (jso.has(arrayparam)) jsa = jso.getJSONArray(arrayparam);
+                            JSONObject jsoret = new JSONObject(callres);
+                            if (jso.has(arrayparam)) jsa = jsoret.getJSONArray(arrayparam);
                         }else{
                             jsa = new JSONArray(callres);
                         }
@@ -53,7 +53,7 @@ public class LRWS {
         }
     }
 
-    public Object call(String classname, String wshost, String wsname, ArrayList<linParams> params, int method) throws LRWSException{
+    public Object call(String classname, String wshost, String wsname, String[][] params, JSONObject jso, boolean encoded, int method) throws LRWSException{
         LRWSException e = new LRWSException();
 
         if(classname == null || classname.trim().length() <= 0){
@@ -62,12 +62,12 @@ public class LRWS {
         }
 
         LRWSConnector ws = new LRWSConnector();
-        String callres = ws.callWSAS(wshost, wsname, params, method);
+        String callres = ws.callWSAS(wshost, wsname, params, jso, encoded, method);
         if (callres != null) {
                 try {
                     Object ref = Class.forName(classname).newInstance();
-                    JSONObject jso = new JSONObject(callres);
-                    return converter.json2Object(ref, jso, true);
+                    JSONObject jsoret = new JSONObject(callres);
+                    return converter.json2Object(ref, jsoret, true);
                 } catch (Exception ex) {
                     e.setMessage("Error parsing Data");
                     throw e;
@@ -78,10 +78,10 @@ public class LRWS {
         }
     }
 
-    public String callSimple(String wshost, String wsname, ArrayList<linParams> params, int method) throws LRWSException{
+    public String callSimple(String wshost, String wsname, String[][] params, JSONObject jso, boolean encoded, int method) throws LRWSException{
         LRWSException e = new LRWSException();
         LRWSConnector ws = new LRWSConnector();
-        String callres = ws.callWSAS(wshost, wsname, params, method);
+        String callres = ws.callWSAS(wshost, wsname, params, jso, encoded, method);
         if (callres != null) {
             return callres;
         } else {
