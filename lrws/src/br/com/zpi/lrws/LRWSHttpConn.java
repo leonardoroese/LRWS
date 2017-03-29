@@ -48,7 +48,7 @@ public class LRWSHttpConn {
 						epparams = epparams + "&" + s[0] + "=" + s[1];
 				}
 			}
-			if (endpoint.indexOf("?") >= 0)
+			if (endpoint.indexOf("?") < 0)
 				epparams = epparams.replaceFirst("&", "?");
 
 			HttpGet wschama = new HttpGet(endpoint + epparams);
