@@ -25,12 +25,12 @@ public abstract class ConBase {
 	public String resType = null;
 	public String resMsg = null;
 	private int DBD = 1;
-	
+
 	private ServletConfig scontext = null;
 
 	private static final String MYSQLDRIVER = "com.mysql.jdbc.Driver";
 	private static final String POSTGRESQLDRIVER = "org.postgresql.Driver";
-	
+
 	public static final int DBD_MYSQL = 1;
 	public static final int DBD_POSTGRESQL = 2;
 
@@ -38,7 +38,7 @@ public abstract class ConBase {
 		this.scontext = sconf;
 		this.DBD = 1;
 	}
-	
+
 	public ConBase(ServletConfig sconf, int DBD) {
 		this.scontext = sconf;
 		this.DBD = DBD;
@@ -87,42 +87,55 @@ public abstract class ConBase {
 			dbname = ctx.getInitParameter("dbName");
 		try {
 			Statement stmt = null;
-			switch(DBD){
-				case 1:
-					Class.forName(MYSQLDRIVER);
-					connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
-							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-							ctx.getInitParameter("dbPass"));
-					stmt = connection.createStatement();
-					stmt.execute(query);
-					break;
-					
-				case 2:
-					Class.forName(POSTGRESQLDRIVER);
-					connection = (Connection) DriverManager.getConnection("jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
-							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-							ctx.getInitParameter("dbPass"));
-					connection.setAutoCommit(true);
-					stmt = connection.createStatement();
-					stmt.executeQuery(query);
-					break;
-			
-				default:
-					Class.forName(MYSQLDRIVER);
-					connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
-							+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-							ctx.getInitParameter("dbPass"));
-					stmt = connection.createStatement();
-					stmt.execute(query);
-					break;
+			switch (DBD) {
+			case 1:
+				Class.forName(MYSQLDRIVER);
+				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
+						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						ctx.getInitParameter("dbPass"));
+				stmt = connection.createStatement();
+				stmt.execute(query);
+				break;
+
+			case 2:
+				Class.forName(POSTGRESQLDRIVER);
+				connection = (Connection) DriverManager
+						.getConnection(
+								"jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
+										+ ctx.getInitParameter("dbPort") + "/" + dbname,
+								ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
+				connection.setAutoCommit(true);
+				stmt = connection.createStatement();
+				stmt.executeQuery(query);
+				break;
+
+			default:
+				Class.forName(MYSQLDRIVER);
+				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
+						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						ctx.getInitParameter("dbPass"));
+				stmt = connection.createStatement();
+				stmt.execute(query);
+				break;
 
 			}
+
+			boolean done = false;
+			
+			if (stmt.getResultSet() != null || stmt.getUpdateCount() > 0)
+				done = true;
 			
 			connection.close();
 
-			this.resType = "S";
-			this.resMsg = "Operação realizada";
-			return true;
+			if (done) {
+				this.resType = "S";
+				this.resMsg = "Success";
+				return true;
+			} else {
+				this.resType = "E";
+				this.resMsg = "Not executed";
+				return false;
+			}
 
 		} catch (Exception e) {
 			this.resType = "E";
@@ -141,13 +154,13 @@ public abstract class ConBase {
 	public ArrayList<DBLin> readDb(String query, String[] params, boolean encode) {
 		return readDb(query, null, params, encode);
 	}
-	
+
 	public ArrayList<DBLin> readDb(String query, String dbname, String[] params, boolean encode) {
 		Connection connection = null;
 		ServletContext ctx = this.scontext.getServletContext();
 		ResultSet rs = null;
 		ArrayList<DBLin> outres = null;
-		
+
 		if (query == null || query.trim().length() <= 0) {
 			this.resType = "E";
 			this.resMsg = "Inform valid query";
@@ -167,35 +180,37 @@ public abstract class ConBase {
 				}
 			}
 		}
-		
+
 		if (dbname == null)
 			dbname = ctx.getInitParameter("dbName");
 		try {
 
-			switch(DBD){
+			switch (DBD) {
 			case 1:
 				Class.forName(MYSQLDRIVER);
-				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
-						+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-						ctx.getInitParameter("dbPass"));
-				break;
-				
-			case 2:
-				Class.forName(POSTGRESQLDRIVER);
-				connection = (Connection) DriverManager.getConnection("jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
-						+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-						ctx.getInitParameter("dbPass"));
-				break;
-		
-			default:
-				Class.forName(MYSQLDRIVER);
-				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":"
-						+ ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
+						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
 						ctx.getInitParameter("dbPass"));
 				break;
 
-		}
-		
+			case 2:
+				Class.forName(POSTGRESQLDRIVER);
+				connection = (Connection) DriverManager
+						.getConnection(
+								"jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
+										+ ctx.getInitParameter("dbPort") + "/" + dbname,
+								ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
+				break;
+
+			default:
+				Class.forName(MYSQLDRIVER);
+				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
+						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						ctx.getInitParameter("dbPass"));
+				break;
+
+			}
+
 			Statement stmt = (Statement) connection.createStatement();
 			rs = stmt.executeQuery(query);
 			if (rs != null) {
