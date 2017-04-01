@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -106,7 +107,11 @@ public abstract class ConBase {
 								ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
 				connection.setAutoCommit(true);
 				stmt = connection.createStatement();
-				stmt.executeQuery(query);
+				try{
+					stmt.executeQuery(query);
+				}catch(SQLException e){
+					
+				}
 				break;
 
 			default:
