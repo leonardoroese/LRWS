@@ -146,6 +146,11 @@ public abstract class ConBase {
 				}
 				done = true;
 			}
+			
+			if(stmt.getUpdateCount() > 0)
+				done  = true;
+			
+			
 			connection.close();
 
 			if (done) {
