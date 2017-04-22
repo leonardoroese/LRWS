@@ -141,7 +141,7 @@ public abstract class ConBase {
 							lastval = rs.getString(lastval_par);
 					}else{
 						if(rs.getString("id") != null)
-							lastval = rs.getString(lastval_par);
+							lastval = rs.getString("id");
 					}
 				}
 				done = true;
