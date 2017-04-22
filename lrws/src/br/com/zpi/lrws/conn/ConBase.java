@@ -35,6 +35,9 @@ public abstract class ConBase {
 	public static final int DBD_MYSQL = 1;
 	public static final int DBD_POSTGRESQL = 2;
 
+	public String lastval = null;
+	public String lastval_par = null;
+	
 	public ConBase(ServletConfig sconf) {
 		this.scontext = sconf;
 		this.DBD = 1;
@@ -63,7 +66,9 @@ public abstract class ConBase {
 	public boolean updateDB(String query, String dbname, String[] params, boolean encode) {
 		Connection connection = null;
 		ServletContext ctx = this.scontext.getServletContext();
-
+		lastval = null;
+		boolean done = false;
+		
 		if (query == null || query.trim().length() <= 0) {
 			this.resType = "E";
 			this.resMsg = "Inform valid query";
@@ -109,6 +114,7 @@ public abstract class ConBase {
 				stmt = connection.createStatement();
 				try{
 					stmt.executeQuery(query);
+					done = true;
 				}catch(SQLException e){
 					
 				}
@@ -120,16 +126,26 @@ public abstract class ConBase {
 						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
 						ctx.getInitParameter("dbPass"));
 				stmt = connection.createStatement();
-				stmt.execute(query);
+				done = stmt.execute(query);
 				break;
 
 			}
 
-			boolean done = false;
+
 			
-			if (stmt.getResultSet() != null || stmt.getUpdateCount() > 0)
+			ResultSet rs = stmt.getResultSet();
+			if (rs != null){
+				while(rs.next()){
+					if(lastval_par != null){
+						if(rs.getString(lastval_par) != null)
+							lastval = rs.getString(lastval_par);
+					}else{
+						if(rs.getString("id") != null)
+							lastval = rs.getString(lastval_par);
+					}
+				}
 				done = true;
-			
+			}
 			connection.close();
 
 			if (done) {
