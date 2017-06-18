@@ -97,7 +97,7 @@ public abstract class ConBase {
 			case 1:
 				Class.forName(MYSQLDRIVER);
 				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
-						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname + "?allowMultiQueries=true", ctx.getInitParameter("dbUser"),
 						ctx.getInitParameter("dbPass"));
 				stmt = connection.createStatement();
 				stmt.execute(query);
@@ -123,7 +123,7 @@ public abstract class ConBase {
 			default:
 				Class.forName(MYSQLDRIVER);
 				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
-						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
+						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname + "?allowMultiQueries=true", ctx.getInitParameter("dbUser"),
 						ctx.getInitParameter("dbPass"));
 				stmt = connection.createStatement();
 				done = stmt.execute(query);
