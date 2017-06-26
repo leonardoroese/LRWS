@@ -65,6 +65,7 @@ public abstract class ConBase {
 
 	public boolean updateDB(String query, String dbname, String[] params, boolean encode) {
 		Connection connection = null;
+		ResultSet rs = null;
 		ServletContext ctx = this.scontext.getServletContext();
 		lastval = null;
 		boolean done = false;
@@ -100,7 +101,7 @@ public abstract class ConBase {
 						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname + "?allowMultiQueries=true", ctx.getInitParameter("dbUser"),
 						ctx.getInitParameter("dbPass"));
 				stmt = connection.createStatement();
-				stmt.execute(query);
+				done = stmt.execute(query);
 				break;
 
 			case 2:
@@ -116,7 +117,7 @@ public abstract class ConBase {
 					stmt.executeQuery(query);
 					done = true;
 				}catch(SQLException e){
-					
+
 				}
 				break;
 
@@ -130,10 +131,15 @@ public abstract class ConBase {
 				break;
 
 			}
-
-
 			
-			ResultSet rs = stmt.getResultSet();
+			if(stmt.getUpdateCount() > 0)
+				done  = true;
+			
+			rs = stmt.getResultSet();
+			if(rs == null)
+				if(stmt.getMoreResults())
+					rs = stmt.getResultSet();
+				
 			if (rs != null){
 				while(rs.next()){
 					if(lastval_par != null){
@@ -146,11 +152,7 @@ public abstract class ConBase {
 				}
 				done = true;
 			}
-			
-			if(stmt.getUpdateCount() > 0)
-				done  = true;
-			
-			
+
 			connection.close();
 
 			if (done) {
