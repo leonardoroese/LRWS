@@ -35,6 +35,7 @@ public class Mail extends ConBase {
 		props.put("mail.smtp.socketFactory.port", ctx.getInitParameter("mailPort"));
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.starttls.enable", ctx.getInitParameter("mailTLS"));
+		props.put("mail.smtp.ssl.enable", ctx.getInitParameter("mailSSL"));
 		props.put("mail.smtp.user", ctx.getInitParameter("mailFrom"));
 		// props.put("mail.debug", "true");
 		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
