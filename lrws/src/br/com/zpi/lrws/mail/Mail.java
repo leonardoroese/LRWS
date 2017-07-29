@@ -28,22 +28,31 @@ public class Mail extends ConBase {
 
 		Properties props = new Properties();
 		props.put("mail.smtp.host", ctx.getInitParameter("mailHost"));
-		props.put("mail.smtp.socketFactory.port", ctx.getInitParameter("mailPort"));
-		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.auth", ctx.getInitParameter("mailAuth"));
 		props.put("mail.smtp.port", ctx.getInitParameter("mailPort"));
 		props.put("mail.smtp.socketFactory.port", ctx.getInitParameter("mailPort"));
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.starttls.enable", ctx.getInitParameter("mailTLS"));
-		props.put("mail.smtp.ssl.enable", ctx.getInitParameter("mailSSL"));
+		if(ctx.getInitParameter("mailSSL") != null && ctx.getInitParameter("mailSSL").trim().toUpperCase().equals("TRUE")){
+			props.put("mail.smtp.ssl.enable", ctx.getInitParameter("mailSSL"));
+			props.put("mail.smtps.ssl.checkserveridentity", "false");
+			props.put("mail.smtps.ssl.trust", "*");
+			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		}else{
+			
+		}
 		props.put("mail.smtp.user", ctx.getInitParameter("mailFrom"));
-		// props.put("mail.debug", "true");
-		props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		props.put("mail.smtp.socketFactory.fallback", "false");
+		// props.put("mail.debug", "true");
 
-		SimpleAuth auth = null;
-		auth = new SimpleAuth(ctx.getInitParameter("mailUser"), ctx.getInitParameter("mailPass"));
-		Session session = Session.getInstance(props, auth);
+		Session session = null;
+		if(ctx.getInitParameter("mailAuth") != null && ctx.getInitParameter("mailAuth").trim().toUpperCase().equals("TRUE")){
+			SimpleAuth auth = null;
+			auth = new SimpleAuth(ctx.getInitParameter("mailUser"), ctx.getInitParameter("mailPass"));
+			session = Session.getInstance(props, auth);
+		}else{
+			session = Session.getInstance(props);
+		}
 		try {
 
 			Message message = new MimeMessage(session);
