@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import javax.servlet.ServletConfig;
 import br.com.zpi.lrws.LRWSException;
@@ -17,6 +18,8 @@ public class SmartModel extends ConBase implements Serializable {
 	private String targetDB = null;
 	private ServletConfig sconf = null;
 	private int DBD = 0;
+	private linParams[] metainfodb = null;
+
 	/*
 	 * #########################################################################
 	 * ##### CONSTRUCTOR
@@ -29,6 +32,21 @@ public class SmartModel extends ConBase implements Serializable {
 		this.targetDB = targetDB;
 		this.sconf = sconf;
 		this.DBD = DBD;
+	}
+
+	/*
+	 * #########################################################################
+	 * ##### GETTERS SETTERS
+	 * #########################################################################
+	 * #####
+	 */
+
+	public linParams[] getMetainfodb() {
+		return metainfodb;
+	}
+
+	public void setMetainfodb(linParams[] metainfodb) {
+		this.metainfodb = metainfodb;
 	}
 
 	/*
@@ -47,8 +65,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		if (keys != null && keys.length > 0) {
 			for (Field f : this.getClass().getDeclaredFields()) {
-				if (f.getName() != "serialVersionUID" && f.getName() != "targetDB" && f.getName() != "sconf"
-						&& f.getName() != "DBD") {
+				if (checkFieldExcluded(f.getName())) {
 					boolean qlink = false;
 					for (linParams lin : keys) {
 						if (lin.name != null
@@ -146,8 +163,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (f.getName() != "serialVersionUID" && f.getName() != "targetDB" && f.getName() != "sconf"
-					&& f.getName() != "DBD") {
+			if (checkFieldExcluded(f.getName())) {
 				boolean qlink = false;
 				for (linParams lin : keys) {
 					if (lin.name != null && lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase())) {
@@ -219,24 +235,55 @@ public class SmartModel extends ConBase implements Serializable {
 		String qvalues = "";
 		boolean qset = false;
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (f.getName() != "serialVersionUID" && f.getName() != "targetDB" && f.getName() != "sconf"
-					&& f.getName() != "DBD") {
+			if (checkFieldExcluded(f.getName())) {
 				if (ai == null || ai.trim().toUpperCase().equals(f.getName().toUpperCase())) {
-					if (qset){
+					if (qset) {
 						qfields = qfields + ", ";
 						qvalues = qvalues + ", ";
 					}
-						
+
 					qfields = qfields + f.getName();
-					
+
 					String fval = null;
 					try {
 						fval = (String) f.get(this);
 					} catch (Exception e) {
 						throw new LRWSException("E", "LRWS", "lrws.e.modexkeyvalue");
 					}
-					
-					qvalues = qvalues + fval;
+					if (metainfodb != null && metainfodb.length > 0) {
+						boolean metafound = false;
+						for (linParams lm : metainfodb) {
+							if (lm.name.trim().equals(f.getName().trim())) {
+								switch (lm.value) {
+								case "S":
+									if (fval != null)
+										qvalues = qvalues + "'" + fval + "'";
+									else
+										qvalues = qvalues + "NULL";
+									break;
+								case "E":
+									if (fval != null)
+										try {
+											qvalues = qvalues + "'" + URLEncoder.encode(fval, "UTF-8") + "'";
+										} catch (Exception e) {
+
+										}
+									else
+										qvalues = qvalues + "NULL";
+									break;
+								default:
+									qvalues = qvalues + fval;
+									break;
+
+								}
+								metafound = true;
+							}
+							if(!metafound)
+								qvalues = qvalues + fval;
+						}
+					} else {
+						qvalues = qvalues + fval;
+					}
 				}
 			}
 		}
@@ -245,21 +292,21 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		// EXECUTE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
-		if(ai != null)
+		if (ai != null)
 			lastval_par = ai;
-		
+
 		boolean res = updateDB(query);
 
 		// ++++++++++++++++++++++++++++++++++++++
 		// UPDATE OBJECT
 		// ++++++++++++++++++++++++++++++++++++++
 		if (res) {
-			if(ai != null && lastval != null)
+			if (ai != null && lastval != null)
 				return lastval;
 			else
 				throw new LRWSException("E", "LRWS", "lrws.e.modnotcreated");
-			
-		}else
+
+		} else
 			throw new LRWSException("E", "LRWS", "lrws.e.modnotcreated");
 
 	}
@@ -280,8 +327,7 @@ public class SmartModel extends ConBase implements Serializable {
 		boolean qset = false;
 
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (f.getName() != "serialVersionUID" && f.getName() != "targetDB" && f.getName() != "sconf"
-					&& f.getName() != "DBD") {
+			if (checkFieldExcluded(f.getName())) {
 				String fval = null;
 				try {
 					fval = (String) f.get(this);
@@ -292,8 +338,40 @@ public class SmartModel extends ConBase implements Serializable {
 					query = query + ", ";
 				qset = true;
 
-				query = query + f.getName() + " = " + fval;
+				if (metainfodb != null && metainfodb.length > 0) {
+					boolean metafound = false;
+					for (linParams lm : metainfodb) {
+						if (lm.name.trim().equals(f.getName().trim())) {
+							switch (lm.value) {
+							case "S":
+								if (fval != null)
+									query = query + f.getName() + " = " + "'" + fval + "'";
+								else
+									query = query + f.getName() + " = " + "NULL";
+								break;
+							case "E":
+								if (fval != null)
+									try {
+										query = query + f.getName() + " = " + "'" + URLEncoder.encode(fval, "UTF-8") + "'";
+									} catch (Exception e) {
 
+									}
+								else
+									query = query + f.getName() + " = " + "NULL";
+								break;
+							default:
+								query = query + f.getName() + " = " + fval;
+								break;
+
+							}
+							metafound = true;
+						}
+						if(!metafound)
+							query = query + f.getName() + " = " + fval;
+					}
+				} else {
+					query = query + f.getName() + " = " + fval;
+				}
 				boolean qlink = false;
 				for (linParams lin : keys) {
 					if (lin.value != null && lin.value.trim().length() > 0) {
@@ -351,8 +429,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (f.getName() != "serialVersionUID" && f.getName() != "targetDB" && f.getName() != "sconf"
-					&& f.getName() != "DBD") {
+			if (checkFieldExcluded(f.getName())) {
 				boolean qlink = false;
 				for (linParams lin : keys) {
 					if (lin.name != null && lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase())) {
@@ -394,6 +471,24 @@ public class SmartModel extends ConBase implements Serializable {
 		} else {
 			return false;
 		}
+	}
+
+	/*
+	 * #########################################################################
+	 * ##### CHECK FIELD EXCLUDED
+	 * #########################################################################
+	 * #####
+	 */
+
+	private boolean checkFieldExcluded(String fname) {
+		if (fname == null)
+			return false;
+		String[] fexcl = new String[] { "serialVersionUID", "targetDB", "sconf", "DBD", "metainfodb" };
+		for (String s : fexcl)
+			if (s.trim().equals(fname.trim()))
+				return true;
+		return false;
+
 	}
 
 }
