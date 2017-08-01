@@ -18,7 +18,8 @@ public class SmartModel extends ConBase implements Serializable {
 	private String targetDB = null;
 	private ServletConfig sconf = null;
 	private int DBD = 0;
-	private linParams[] metainfodb = null;
+	private linParams[] metainfodb = null; // S -String, E - Encoded String, X -
+											// not used
 
 	/*
 	 * #########################################################################
@@ -65,7 +66,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		if (keys != null && keys.length > 0) {
 			for (Field f : this.getClass().getDeclaredFields()) {
-				if (checkFieldExcluded(f.getName())) {
+				if (!checkFieldExcluded(f.getName())) {
 					boolean qlink = false;
 					for (linParams lin : keys) {
 						if (lin.name != null
@@ -163,7 +164,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (checkFieldExcluded(f.getName())) {
+			if (!checkFieldExcluded(f.getName())) {
 				boolean qlink = false;
 				for (linParams lin : keys) {
 					if (lin.name != null && lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase())) {
@@ -235,7 +236,7 @@ public class SmartModel extends ConBase implements Serializable {
 		String qvalues = "";
 		boolean qset = false;
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (checkFieldExcluded(f.getName())) {
+			if (!checkFieldExcluded(f.getName())) {
 				if (ai == null || ai.trim().toUpperCase().equals(f.getName().toUpperCase())) {
 					if (qset) {
 						qfields = qfields + ", ";
@@ -278,7 +279,7 @@ public class SmartModel extends ConBase implements Serializable {
 								}
 								metafound = true;
 							}
-							if(!metafound)
+							if (!metafound)
 								qvalues = qvalues + fval;
 						}
 					} else {
@@ -327,7 +328,7 @@ public class SmartModel extends ConBase implements Serializable {
 		boolean qset = false;
 
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (checkFieldExcluded(f.getName())) {
+			if (!checkFieldExcluded(f.getName())) {
 				String fval = null;
 				try {
 					fval = (String) f.get(this);
@@ -352,7 +353,8 @@ public class SmartModel extends ConBase implements Serializable {
 							case "E":
 								if (fval != null)
 									try {
-										query = query + f.getName() + " = " + "'" + URLEncoder.encode(fval, "UTF-8") + "'";
+										query = query + f.getName() + " = " + "'" + URLEncoder.encode(fval, "UTF-8")
+												+ "'";
 									} catch (Exception e) {
 
 									}
@@ -366,7 +368,7 @@ public class SmartModel extends ConBase implements Serializable {
 							}
 							metafound = true;
 						}
-						if(!metafound)
+						if (!metafound)
 							query = query + f.getName() + " = " + fval;
 					}
 				} else {
@@ -429,7 +431,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (checkFieldExcluded(f.getName())) {
+			if (!checkFieldExcluded(f.getName())) {
 				boolean qlink = false;
 				for (linParams lin : keys) {
 					if (lin.name != null && lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase())) {
@@ -475,7 +477,7 @@ public class SmartModel extends ConBase implements Serializable {
 
 	/*
 	 * #########################################################################
-	 * ##### CHECK FIELD EXCLUDED
+	 * ##### CHECK FIELD EXCLUDED(true)
 	 * #########################################################################
 	 * #####
 	 */
@@ -487,6 +489,12 @@ public class SmartModel extends ConBase implements Serializable {
 		for (String s : fexcl)
 			if (s.trim().equals(fname.trim()))
 				return true;
+		if (metainfodb != null && metainfodb.length > 0)
+			for (linParams ml : metainfodb)
+				if (ml != null && ml.name.trim().equals(fname.trim()) && ml.value != null
+						&& ml.value.trim().toUpperCase().equals("X"))
+					return true;
+
 		return false;
 
 	}
