@@ -17,6 +17,13 @@ public class LRWS {
 
 	private LRWSConverter converter = new LRWSConverter();
 
+	/*
+	 * #########################################################################
+	 * ##### CALL WS Return Array of Object
+	 * #########################################################################
+	 * #####
+	 */
+	
 	public Object[] callArray(String classname, String arrayparam, String wshost, String wsname, String[][] params,
 			JSONObject jso, boolean encoded, int method) throws LRWSException {
 		LRWSException e = new LRWSException();
@@ -55,6 +62,13 @@ public class LRWS {
 		}
 	}
 
+	/*
+	 * #########################################################################
+	 * ##### CALL WS Return Simple Object
+	 * #########################################################################
+	 * #####
+	 */
+	
 	public Object call(String classname, String wshost, String wsname, String[][] params, JSONObject jso,
 			boolean encoded, int method) throws LRWSException {
 		LRWSException e = new LRWSException();
@@ -81,6 +95,14 @@ public class LRWS {
 		}
 	}
 
+	
+	/*
+	 * #########################################################################
+	 * ##### CALL WS Return String JSON
+	 * #########################################################################
+	 * #####
+	 */
+	
 	public String callSimple(String wshost, String wsname, String[][] params, JSONObject jso, boolean encoded,
 			int method) throws LRWSException {
 		LRWSException e = new LRWSException();
@@ -94,9 +116,12 @@ public class LRWS {
 		}
 	}
 
-	// ####################################################################
-	// Java Class(model) To JSON OBJECT CONVERTER
-	// ####################################################################
+	/*
+	 * #########################################################################
+	 * ##### Convert Object to JSONObject
+	 * #########################################################################
+	 * #####
+	 */
 
 	public JSONObject lin2json(Object o, boolean encoded) {
 		return lin2json(o, encoded, false);
@@ -137,9 +162,12 @@ public class LRWS {
 		return jout;
 	}
 
-	// ####################################################################
-	// Object Lin to JSON Array
-	// ####################################################################
+	/*
+	 * #########################################################################
+	 * ##### Convert Object to JSONArray
+	 * #########################################################################
+	 * #####
+	 */
 	public JSONArray lin2json(Object[] ao, boolean encoded) {
 		if (ao == null)
 			return null;
@@ -180,9 +208,12 @@ public class LRWS {
 		return jout;
 	}
 
-	// ####################################################################
-	// JSONObject to Java Line Object
-	// ####################################################################
+	/*
+	 * #########################################################################
+	 * ##### Convert JSONObject to Object
+	 * #########################################################################
+	 * #####
+	 */
 
 	public Object json2Object(Object o, JSONObject jso, boolean decode) {
 		if (jso == null)
@@ -236,9 +267,12 @@ public class LRWS {
 		return o;
 	}
 
-	// ####################################################################
-	// JSONArray to Java Line Object Array
-	// ####################################################################
+	/*
+	 * #########################################################################
+	 * ##### Convert JSON Array to Object Array
+	 * #########################################################################
+	 * #####
+	 */
 	public Object[] json2ObjectA(Object[] o, JSONArray jsa, boolean decode) {
 		if (jsa == null)
 			return null;
