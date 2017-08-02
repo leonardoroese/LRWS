@@ -19,8 +19,13 @@ public class SmartModel extends ConBase implements Serializable {
 	private String targetDB = null;
 	private ServletConfig sconf = null;
 	private int DBD = 0;
-	private linParams[] metainfodb = null; // S -String, E - Encoded String, X -
-											// not used
+	private linParams[] metainfodb = null; 
+	/* OPTIONS values
+	 * S  -String 
+	 * E  - Encoded String
+	 * X  - not used
+	*/
+	public String rows_total = null;										
 
 	/*
 	 * #########################################################################
@@ -59,10 +64,15 @@ public class SmartModel extends ConBase implements Serializable {
 	 * keys = obligatory composed by linParam.name (name of key) linParam.value(value of key)
 	 */
 
-	public Object[] listOfMe(linParams[] keys, linParams[] ord, int page, int limit) throws LRWSException {
+	public Object[] listOfMe(linParams[] keys, linParams[] ord, int page, int limit, boolean bringtotal) throws LRWSException {
 
 		String query = "SELECT * FROM " + targetDB + " ";
-
+		String querywhere = " WHERE ";
+		String queryend = "";
+		
+		String querycount = "SELECT COUNT (*) AS rowstotal FROM " + targetDB + " ";
+		String rows_count = null;
+					
 		// ++++++++++++++++++++++++++++++++++++++
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
@@ -76,28 +86,28 @@ public class SmartModel extends ConBase implements Serializable {
 								&& lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase())) {
 							if (lin.value != null && lin.value.trim().length() > 0) {
 								if (qlink)
-									query = query + " AND ";
+									querywhere = querywhere + " AND ";
 								if (mityp != null) {
 									switch (mityp) {
 									case "S":
 										if (lin.value != null)
-											query = query + " " + f.getName() + " = '" + lin.value.trim() + "' ";
+											querywhere = querywhere + " " + f.getName() + " = '" + lin.value.trim() + "' ";
 										else
-											query = query + " " + f.getName() + " = NULL ";
+											querywhere = querywhere + " " + f.getName() + " = NULL ";
 										break;
 									case "E":
 										if (lin.value != null)
 											try {
-												query = query + " " + f.getName() + " = '"
+												querywhere = querywhere + " " + f.getName() + " = '"
 														+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
 											} catch (Exception e) {
 												throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 											}
 										else
-											query = query + " " + f.getName() + " = NULL ";
+											querywhere = querywhere + " " + f.getName() + " = NULL ";
 										break;
 									default:
-										query = query + " " + f.getName() + " = " + lin.value.trim() + " ";
+										querywhere = querywhere + " " + f.getName() + " = " + lin.value.trim() + " ";
 										break;
 									}
 								}
@@ -110,16 +120,20 @@ public class SmartModel extends ConBase implements Serializable {
 					}
 				}
 			}
+			query = query + querywhere;
+			querycount = querycount + querywhere;
 		}
 
+
 		if (ord != null && ord.length > 0) {
-			query = query + " ORDER BY ";
+			queryend = queryend + " ORDER BY ";
+			
 			boolean ordq = false;
 
 			for (linParams lin : ord) {
 				if (ordq)
-					query = query + ", ";
-				query = query + lin.name + " " + lin.value;
+					queryend = queryend + ", ";
+				queryend = queryend + lin.name + " " + lin.value;
 				ordq = true;
 			}
 		}
@@ -127,20 +141,27 @@ public class SmartModel extends ConBase implements Serializable {
 		if (limit > 0) {
 			switch (DBD) {
 			case DBD_POSTGRESQL:
-				query = query + " LIMIT " + limit + " OFFSET " + (limit * page);
+				queryend = queryend + " LIMIT " + limit + " OFFSET " + (limit * page);
 				break;
 			case DBD_MYSQL:
-				query = query + " LIMIT " + page + " , " + limit;
+				queryend = queryend + " LIMIT " + page + " , " + limit;
 				break;
 			default:
-				query = query + " LIMIT " + page + ", " + limit;
+				queryend = queryend + " LIMIT " + page + ", " + limit;
 				break;
 			}
 		}
+		query = query + queryend;
 
 		// ++++++++++++++++++++++++++++++++++++++
 		// EXECUTE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
+		if(bringtotal){
+			ArrayList<DBLin> altt = readDb(query);
+			if (altt != null && altt.size() > 0) {
+				rows_count = altt.get(0).getVal("rowstotal").toString();
+			}
+		}
 		ArrayList<DBLin> al = readDb(query);
 
 		// ++++++++++++++++++++++++++++++++++++++
@@ -170,6 +191,13 @@ public class SmartModel extends ConBase implements Serializable {
 					}
 				} catch (Exception e) {
 					throw new LRWSException("E", "LRWS_NORES", "lrws.e.moderrcreateinst");
+				}
+				if(out != null && out[c] != null && bringtotal && rows_count != null){
+					try{
+						out[c].getClass().getDeclaredField("rows_total").set(out[c], rows_count);
+					}catch(Exception e){
+						
+					}
 				}
 				c++;
 			}
