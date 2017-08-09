@@ -69,7 +69,7 @@ public class SmartModel extends ConBase implements Serializable {
 		String querywhere = " WHERE ";
 		String queryend = "";
 
-		String querycount = "SELECT COUNT (*) AS rowstotal FROM " + targetDB + " ";
+		String querycount = "SELECT COUNT(*) AS rowstotal FROM " + targetDB + " ";
 		String rows_count = null;
 
 		// ++++++++++++++++++++++++++++++++++++++
@@ -161,7 +161,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// EXECUTE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
 		if (bringtotal) {
-			ArrayList<DBLin> altt = readDb(query);
+			ArrayList<DBLin> altt = readDb(querycount);
 			if (altt != null && altt.size() > 0) {
 				rows_count = altt.get(0).getVal("rowstotal").toString();
 			}
@@ -199,9 +199,9 @@ public class SmartModel extends ConBase implements Serializable {
 				}
 				if (out != null && out[c] != null && bringtotal && rows_count != null) {
 					try {
-						out[c].getClass().getDeclaredField("rows_total").set(out[c], rows_count);
+						out[c].getClass().getSuperclass().getDeclaredField("rows_total").set(out[c], rows_count);
 					} catch (Exception e) {
-
+						String em = e.getMessage();
 					}
 				}
 				c++;

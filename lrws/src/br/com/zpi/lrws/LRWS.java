@@ -2,6 +2,7 @@ package br.com.zpi.lrws;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class LRWS {
 	 * #########################################################################
 	 * #####
 	 */
-	
+
 	public Object[] callArray(String classname, String arrayparam, String wshost, String wsname, String[][] params,
 			JSONObject jso, boolean encoded, int method) throws LRWSException {
 		LRWSException e = new LRWSException();
@@ -68,7 +69,7 @@ public class LRWS {
 	 * #########################################################################
 	 * #####
 	 */
-	
+
 	public Object call(String classname, String wshost, String wsname, String[][] params, JSONObject jso,
 			boolean encoded, int method) throws LRWSException {
 		LRWSException e = new LRWSException();
@@ -95,14 +96,13 @@ public class LRWS {
 		}
 	}
 
-	
 	/*
 	 * #########################################################################
 	 * ##### CALL WS Return String JSON
 	 * #########################################################################
 	 * #####
 	 */
-	
+
 	public String callSimple(String wshost, String wsname, String[][] params, JSONObject jso, boolean encoded,
 			int method) throws LRWSException {
 		LRWSException e = new LRWSException();
@@ -131,32 +131,57 @@ public class LRWS {
 		if (o == null)
 			return null;
 		JSONObject jout = new JSONObject();
-		for (Field f : o.getClass().getDeclaredFields()) {
-			try {
-				if (f.get(o) != null && f.get(o).getClass().isArray()) {
-					JSONArray ao = lin2json((Object[]) f.get(o), encoded);
-					jout.put(f.getName(), ao);
-				} else {
-					String val = null;
-					if (f.get(o).getClass().getName().indexOf("String") < 0) {
-						JSONObject t_jo = lin2json(f.get(o), encoded);
-						if (t_jo != null)
-							jout.put(f.getName(), t_jo);
-						else
-							jout.put(f.getName(), "");
-					} else {
-						val = (String) f.get(o);
-						if (val != null)
-							if (encoded)
-								jout.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
-							else
-								jout.put(f.getName(), f.get(o));
-						else if (!ignorenull)
-							jout.put(f.getName(), "");
-					}
-				}
-			} catch (Exception e) {
 
+		// Get current class and superclass fields
+		Field[] ofields = null;
+		Field[] supfields = null;
+		Field[] allfields = null;
+		ofields = o.getClass().getDeclaredFields();
+		if (o.getClass().getSuperclass() != null) {
+			supfields = o.getClass().getSuperclass().getDeclaredFields();
+			allfields = new Field[ofields.length + supfields.length];
+			int c = 0;
+			for (Field f : ofields) {
+				allfields[c] = f;
+				c++;
+			}
+			for (Field f : supfields) {
+				allfields[c] = f;
+				c++;
+			}
+		} else {
+			allfields = ofields;
+		}
+
+		for (Field f : allfields) {
+			// Only public fields
+			if (Modifier.isPublic(f.getModifiers())) {
+				try {
+					if (f.get(o) != null && f.get(o).getClass().isArray()) {
+						JSONArray ao = lin2json((Object[]) f.get(o), encoded);
+						jout.put(f.getName(), ao);
+					} else {
+						String val = null;
+						if (f.get(o).getClass().getName().indexOf("String") < 0) {
+							JSONObject t_jo = lin2json(f.get(o), encoded);
+							if (t_jo != null)
+								jout.put(f.getName(), t_jo);
+							else
+								jout.put(f.getName(), "");
+						} else {
+							val = (String) f.get(o);
+							if (val != null)
+								if (encoded)
+									jout.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
+								else
+									jout.put(f.getName(), f.get(o));
+							else if (!ignorenull)
+								jout.put(f.getName(), "");
+						}
+					}
+				} catch (Exception e) {
+
+				}
 			}
 		}
 		return jout;
@@ -175,33 +200,36 @@ public class LRWS {
 		for (Object o : ao) {
 			JSONObject jso = new JSONObject();
 			for (Field f : o.getClass().getDeclaredFields()) {
-				try {
-					if (f.get(o) != null && f.get(o).getClass().isArray()) {
-						JSONArray aao = lin2json((Object[]) f.get(o), true);
-						jso.put(f.getName(), aao);
-					} else {
-						String val = null;
-						if (f.get(o).getClass().getName().indexOf("String") < 0) {
-							JSONObject t_jo = lin2json(f.get(o), encoded);
-							if (t_jo != null)
-								jso.put(f.getName(), t_jo);
-							else
-								jso.put(f.getName(), "");
+				// Only public fields
+				if (Modifier.isPublic(f.getModifiers())) {
+					try {
+						if (f.get(o) != null && f.get(o).getClass().isArray()) {
+							JSONArray aao = lin2json((Object[]) f.get(o), true);
+							jso.put(f.getName(), aao);
 						} else {
-							val = (String) f.get(o);
-							if (val != null)
-								if (encoded)
-									jso.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
+							String val = null;
+							if (f.get(o).getClass().getName().indexOf("String") < 0) {
+								JSONObject t_jo = lin2json(f.get(o), encoded);
+								if (t_jo != null)
+									jso.put(f.getName(), t_jo);
 								else
-									jso.put(f.getName(), (String) f.get(o));
-							else
-								jso.put(f.getName(), "");
-						}
+									jso.put(f.getName(), "");
+							} else {
+								val = (String) f.get(o);
+								if (val != null)
+									if (encoded)
+										jso.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
+									else
+										jso.put(f.getName(), (String) f.get(o));
+								else
+									jso.put(f.getName(), "");
+							}
 
+						}
+					} catch (Exception e) {
+						jso.put(f.getName(), "");
 					}
-				} catch (Exception e) {
-					jso.put(f.getName(), "");
-				}
+				} // public fields
 			}
 			jout.put(jso);
 		}
@@ -229,6 +257,7 @@ public class LRWS {
 			String key = iter.next();
 			try {
 				if (jso.get(key).getClass().equals(jsa.getClass())) {
+					// IS JSON ARRAY?
 					String clname = o.getClass().getDeclaredField(key).getType().getName();
 					if (clname.trim().indexOf("[") == 0)
 						clname = clname.substring(2, clname.length() - 1);
@@ -242,21 +271,34 @@ public class LRWS {
 					ao = json2ObjectA(ao, (JSONArray) jso.get(key), decode);
 					if (ao != null) {
 						o.getClass().getDeclaredField(key).set(o, ao);
+						if (o.getClass().getSuperclass() != null)
+							o.getClass().getSuperclass().getDeclaredField(key).set(o, ao);
 					}
 				} else if (jso.get(key).getClass().equals(jso.getClass())) {
+					// IS JSON OBJECT?
 					String clname = o.getClass().getDeclaredField(key).getType().getName();
 					if (clname.trim().indexOf("[") == 0)
 						clname = clname.substring(2, clname.length() - 1);
 					Object no = Class.forName(clname).newInstance();
 					no = json2Object(no, jso.getJSONObject(key), decode);
 					o.getClass().getDeclaredField(key).set(o, no);
+					if (o.getClass().getSuperclass() != null)
+						o.getClass().getSuperclass().getDeclaredField(key).set(o, no);
 				} else {
+					// IS OTHER OBJECT (STRING)?
 					if (o.getClass().getDeclaredField(key) != null) {
-						if (decode)
+						if (decode) {
 							o.getClass().getDeclaredField(key).set(o,
 									URLDecoder.decode((String) jso.get(key).toString(), "UTF-8"));
-						else
+							if (o.getClass().getSuperclass() != null)
+								o.getClass().getSuperclass().getDeclaredField(key).set(o,
+										URLDecoder.decode((String) jso.get(key).toString(), "UTF-8"));
+						} else {
 							o.getClass().getDeclaredField(key).set(o, (String) jso.get(key).toString());
+							if (o.getClass().getSuperclass() != null)
+								o.getClass().getSuperclass().getDeclaredField(key).set(o,
+										(String) jso.get(key).toString());
+						}
 					}
 				}
 			} catch (Exception e) {
@@ -284,7 +326,7 @@ public class LRWS {
 			try {
 				String clname = o.getClass().getName();
 				String clnameredux = clname.substring(2, clname.length() - 1);
-				if(o[i] == null)
+				if (o[i] == null)
 					o[i] = Class.forName(clnameredux).newInstance();
 				if (jsa.get(i).getClass().equals(jsa.getClass())) {
 					// is array
