@@ -33,6 +33,8 @@ public class LRWSConverter {
             try {
                 if(jso.get(key).getClass().equals(jsa.getClass())){
                     String clname = o.getClass().getDeclaredField(key).getType().getName();
+                    if(o.getClass().getDeclaredField(key).getDeclaringClass().getName().equals("br.com.zpi.lrws.model.SmartModel") || o.getClass().getDeclaredField(key).getDeclaringClass().getName().equals("br.com.zpi.lrws.conn.ConBase"))
+                    	continue;
                     if(clname.trim().indexOf("[") == 0)
                     	clname = clname.substring(2, clname.length() - 1);
                     Object[] ao = (Object[]) Array.newInstance(Class.forName(clname),((JSONArray)jso.get(key)).length());

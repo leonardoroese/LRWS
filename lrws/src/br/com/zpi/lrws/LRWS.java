@@ -284,7 +284,8 @@ public class LRWS {
 			try {
 				String clname = o.getClass().getName();
 				String clnameredux = clname.substring(2, clname.length() - 1);
-				o[i] = Class.forName(clnameredux).newInstance();
+				if(o[i] == null)
+					o[i] = Class.forName(clnameredux).newInstance();
 				if (jsa.get(i).getClass().equals(jsa.getClass())) {
 					// is array
 					Object[] ao = json2ObjectA(o, jsa.getJSONArray(i), decode);

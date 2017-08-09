@@ -110,6 +110,11 @@ public class SmartModel extends ConBase implements Serializable {
 										querywhere = querywhere + " " + f.getName() + " = " + lin.value.trim() + " ";
 										break;
 									}
+								} else {
+									if (lin.value != null)
+										querywhere = querywhere + " " + f.getName() + " = " + lin.value.trim() + " ";
+									else
+										querywhere = querywhere + " " + f.getName() + " = NULL ";
 								}
 								qlink = true;
 							} else {
@@ -423,7 +428,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		if (res) {
 			if (ai != null)
-				if(lastval != null)
+				if (lastval != null)
 					return lastval;
 				else
 					throw new LRWSException("E", "LRWS", "lrws.e.modnotcreated");
