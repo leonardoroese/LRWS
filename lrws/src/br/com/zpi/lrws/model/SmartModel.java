@@ -19,13 +19,11 @@ public class SmartModel extends ConBase implements Serializable {
 	private String targetDB = null;
 	private ServletConfig sconf = null;
 	private int DBD = 0;
-	private linParams[] metainfodb = null; 
-	/* OPTIONS values
-	 * S  -String 
-	 * E  - Encoded String
-	 * X  - not used
-	*/
-	public String rows_total = null;										
+	private linParams[] metainfodb = null;
+	/*
+	 * OPTIONS values S -String E - Encoded String X - not used
+	 */
+	public String rows_total = null;
 
 	/*
 	 * #########################################################################
@@ -60,19 +58,20 @@ public class SmartModel extends ConBase implements Serializable {
 	 * #########################################################################
 	 * ##### LIST
 	 * #########################################################################
-	 * #####
-	 * keys = obligatory composed by linParam.name (name of key) linParam.value(value of key)
+	 * ##### keys = obligatory composed by linParam.name (name of key)
+	 * linParam.value(value of key)
 	 */
 
-	public Object[] listOfMe(linParams[] keys, linParams[] ord, int page, int limit, boolean bringtotal) throws LRWSException {
+	public Object[] listOfMe(linParams[] keys, linParams[] ord, int page, int limit, boolean bringtotal)
+			throws LRWSException {
 
 		String query = "SELECT * FROM " + targetDB + " ";
 		String querywhere = " WHERE ";
 		String queryend = "";
-		
+
 		String querycount = "SELECT COUNT (*) AS rowstotal FROM " + targetDB + " ";
 		String rows_count = null;
-					
+
 		// ++++++++++++++++++++++++++++++++++++++
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
@@ -91,7 +90,8 @@ public class SmartModel extends ConBase implements Serializable {
 									switch (mityp) {
 									case "S":
 										if (lin.value != null)
-											querywhere = querywhere + " " + f.getName() + " = '" + lin.value.trim() + "' ";
+											querywhere = querywhere + " " + f.getName() + " = '" + lin.value.trim()
+													+ "' ";
 										else
 											querywhere = querywhere + " " + f.getName() + " = NULL ";
 										break;
@@ -124,10 +124,9 @@ public class SmartModel extends ConBase implements Serializable {
 			querycount = querycount + querywhere;
 		}
 
-
 		if (ord != null && ord.length > 0) {
 			queryend = queryend + " ORDER BY ";
-			
+
 			boolean ordq = false;
 
 			for (linParams lin : ord) {
@@ -156,7 +155,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		// EXECUTE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
-		if(bringtotal){
+		if (bringtotal) {
 			ArrayList<DBLin> altt = readDb(query);
 			if (altt != null && altt.size() > 0) {
 				rows_count = altt.get(0).getVal("rowstotal").toString();
@@ -177,11 +176,12 @@ public class SmartModel extends ConBase implements Serializable {
 					out[c] = ctor.newInstance(new Object[] { sconf, DBD, targetDB });
 					for (DBParVal p : lin.cols) {
 						try {
-							if (p.value != null){
+							if (p.value != null) {
 								String mityp = getMetaInfoType(p.param);
-								if(mityp != null && mityp.trim().equals("E") && p.value != null){
-									out[c].getClass().getDeclaredField(p.param).set(out[c], URLDecoder.decode(p.value,"UTF-8"));
-								}else{
+								if (mityp != null && mityp.trim().equals("E") && p.value != null) {
+									out[c].getClass().getDeclaredField(p.param).set(out[c],
+											URLDecoder.decode(p.value, "UTF-8"));
+								} else {
 									out[c].getClass().getDeclaredField(p.param).set(out[c], p.value);
 								}
 							}
@@ -192,11 +192,11 @@ public class SmartModel extends ConBase implements Serializable {
 				} catch (Exception e) {
 					throw new LRWSException("E", "LRWS_NORES", "lrws.e.moderrcreateinst");
 				}
-				if(out != null && out[c] != null && bringtotal && rows_count != null){
-					try{
+				if (out != null && out[c] != null && bringtotal && rows_count != null) {
+					try {
 						out[c].getClass().getDeclaredField("rows_total").set(out[c], rows_count);
-					}catch(Exception e){
-						
+					} catch (Exception e) {
+
 					}
 				}
 				c++;
@@ -279,11 +279,12 @@ public class SmartModel extends ConBase implements Serializable {
 			for (DBLin lin : al) {
 				for (DBParVal p : lin.cols) {
 					try {
-						if (p.value != null){
+						if (p.value != null) {
 							String mityp = getMetaInfoType(p.param);
-							if(mityp != null && mityp.trim().equals("E") && p.value != null){
-								this.getClass().getDeclaredField(p.param).set(this, URLDecoder.decode(p.value,"UTF-8"));
-							}else{
+							if (mityp != null && mityp.trim().equals("E") && p.value != null) {
+								this.getClass().getDeclaredField(p.param).set(this,
+										URLDecoder.decode(p.value, "UTF-8"));
+							} else {
 								this.getClass().getDeclaredField(p.param).set(this, p.value);
 							}
 						}
@@ -317,13 +318,6 @@ public class SmartModel extends ConBase implements Serializable {
 		for (Field f : this.getClass().getDeclaredFields()) {
 			if (!checkFieldExcluded(f.getName())) {
 				if (ai == null || ai.trim().toUpperCase().equals(f.getName().toUpperCase())) {
-					if (qset) {
-						qfields = qfields + ", ";
-						qvalues = qvalues + ", ";
-					}
-
-					qfields = qfields + f.getName();
-
 					String fval = null;
 					try {
 						fval = (String) f.get(this);
@@ -336,33 +330,80 @@ public class SmartModel extends ConBase implements Serializable {
 							if (lm.name.trim().equals(f.getName().trim())) {
 								switch (lm.value) {
 								case "S":
-									if (fval != null)
+									if (fval != null) {
+										if (qset) {
+											qfields = qfields + ", ";
+											qvalues = qvalues + ", ";
+										}
+										qfields = qfields + f.getName();
 										qvalues = qvalues + "'" + fval + "'";
-									else
+										qset = true;
+									} else {
+										if (qset) {
+											qfields = qfields + ", ";
+											qvalues = qvalues + ", ";
+										}
+										qfields = qfields + f.getName();
 										qvalues = qvalues + "NULL";
+										qset = true;
+									}
 									break;
 								case "E":
 									if (fval != null)
 										try {
+											if (qset) {
+												qfields = qfields + ", ";
+												qvalues = qvalues + ", ";
+											}
+											qfields = qfields + f.getName();
 											qvalues = qvalues + "'" + URLEncoder.encode(fval, "UTF-8") + "'";
+											qset = true;
 										} catch (Exception e) {
 
 										}
-									else
+									else {
+										if (qset) {
+											qfields = qfields + ", ";
+											qvalues = qvalues + ", ";
+										}
+										qfields = qfields + f.getName();
 										qvalues = qvalues + "NULL";
+										qset = true;
+									}
+									break;
+								case "X":
 									break;
 								default:
+									if (qset) {
+										qfields = qfields + ", ";
+										qvalues = qvalues + ", ";
+									}
+									qfields = qfields + f.getName();
 									qvalues = qvalues + fval;
+									qset = true;
 									break;
 
 								}
 								metafound = true;
 							}
-							if (!metafound)
-								qvalues = qvalues + fval;
+						}
+						if (!metafound) {
+							if (qset) {
+								qfields = qfields + ", ";
+								qvalues = qvalues + ", ";
+							}
+							qfields = qfields + f.getName();
+							qvalues = qvalues + fval;
+							qset = true;
 						}
 					} else {
+						if (qset) {
+							qfields = qfields + ", ";
+							qvalues = qvalues + ", ";
+						}
+						qfields = qfields + f.getName();
 						qvalues = qvalues + fval;
+						qset = true;
 					}
 				}
 			}
@@ -381,10 +422,13 @@ public class SmartModel extends ConBase implements Serializable {
 		// UPDATE OBJECT
 		// ++++++++++++++++++++++++++++++++++++++
 		if (res) {
-			if (ai != null && lastval != null)
-				return lastval;
+			if (ai != null)
+				if(lastval != null)
+					return lastval;
+				else
+					throw new LRWSException("E", "LRWS", "lrws.e.modnotcreated");
 			else
-				throw new LRWSException("E", "LRWS", "lrws.e.modnotcreated");
+				return null;
 
 		} else
 			throw new LRWSException("E", "LRWS", "lrws.e.modnotcreated");
