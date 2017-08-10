@@ -229,46 +229,44 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
-		for (Field f : this.getClass().getDeclaredFields()) {
-			String mityp = getMetaInfoType(f.getName());
-			if (!checkFieldExcluded(f.getName())) {
-				boolean qlink = false;
-				for (linParams lin : keys) {
-					if (lin.name != null && lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase())) {
-						if (lin.value != null && lin.value.trim().length() > 0) {
-							if (qlink)
-								query = query + " AND ";
-							if (mityp != null) {
-								switch (mityp) {
-								case "S":
-									if (lin.value != null)
-										query = query + " " + f.getName() + " = '" + lin.value.trim() + "' ";
-									else
-										query = query + " " + f.getName() + " = NULL ";
-									break;
-								case "E":
-									if (lin.value != null)
-										try {
-											query = query + " " + f.getName() + " = '"
-													+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
-										} catch (Exception e) {
-											throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
-										}
-									else
-										query = query + " " + f.getName() + " = NULL ";
-									break;
-								default:
-									query = query + " " + f.getName() + " = " + lin.value.trim() + " ";
-									break;
+		boolean qlink = false;
+		for (linParams lin : keys) {
+			String mityp = getMetaInfoType(lin.name);
+			if (!checkFieldExcluded(lin.name)) {
+				if (lin.value != null && lin.value.trim().length() > 0) {
+					if (qlink)
+						query = query + " AND ";
+					if (mityp != null) {
+						switch (mityp) {
+						case "S":
+							if (lin.value != null)
+								query = query + " " + lin.name + " = '" + lin.value.trim() + "' ";
+							else
+								query = query + " " + lin.name + " = NULL ";
+							break;
+						case "E":
+							if (lin.value != null)
+								try {
+									query = query + " " + lin.name + " = '"
+											+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
+								} catch (Exception e) {
+									throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 								}
-							}
-							qlink = true;
-						} else {
-							throw new LRWSException("E", "LRWS", "lrws.e.modinvalidkey");
+							else
+								query = query + " " + lin.name + " = NULL ";
+							break;
+						default:
+							query = query + " " + lin.name + " = " + lin.value.trim() + " ";
+							break;
 						}
-						break;
+					}else{
+						query = query + " " + lin.name + " = " + lin.value.trim() + " ";
 					}
+					qlink = true;
+				} else {
+					throw new LRWSException("E", "LRWS", "lrws.e.modinvalidkey");
 				}
+				break;
 			}
 		}
 		// ++++++++++++++++++++++++++++++++++++++
@@ -322,7 +320,7 @@ public class SmartModel extends ConBase implements Serializable {
 		boolean qset = false;
 		for (Field f : this.getClass().getDeclaredFields()) {
 			if (!checkFieldExcluded(f.getName())) {
-				if (ai == null || ai.trim().toUpperCase().equals(f.getName().toUpperCase())) {
+				if (ai == null || !ai.trim().toUpperCase().equals(f.getName().toUpperCase())) {
 					String fval = null;
 					try {
 						fval = (String) f.get(this);
@@ -456,7 +454,12 @@ public class SmartModel extends ConBase implements Serializable {
 		boolean qset = false;
 
 		for (Field f : this.getClass().getDeclaredFields()) {
-			if (!checkFieldExcluded(f.getName())) {
+			boolean iskey = false;
+			for (linParams lin : keys)
+				if (lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase()))
+					iskey = true;
+
+			if (!iskey && !checkFieldExcluded(f.getName())) {
 				String fval = null;
 				try {
 					fval = (String) f.get(this);
@@ -496,36 +499,47 @@ public class SmartModel extends ConBase implements Serializable {
 							}
 							metafound = true;
 						}
-						if (!metafound)
-							query = query + f.getName() + " = " + fval;
 					}
+					if (!metafound)
+						query = query + f.getName() + " = " + fval;
 				} else {
 					query = query + f.getName() + " = " + fval;
 				}
-				boolean qlink = false;
-				for (linParams lin : keys) {
-					if (lin.value != null && lin.value.trim().length() > 0) {
-						if (qlink)
-							condition = condition + " AND ";
-						String val = null;
-						try {
-							val = (String) f.get(this);
-						} catch (Exception e) {
-							throw new LRWSException("E", "LRWS", "lrws.e.modexkeyvalue");
-						}
-						if (lin.value.trim().toUpperCase().equals("S")) {
-							condition = condition + " " + f.getName() + " = '" + val + "' ";
-						} else if (lin.value.trim().toUpperCase().equals("I")) {
-							condition = condition + " " + f.getName() + " = " + val + " ";
-						} else {
-							throw new LRWSException("E", "LRWS", "lrws.e.modinvalidkeytype");
-						}
-						qlink = true;
-					} else {
-						throw new LRWSException("E", "LRWS", "lrws.e.modinvalidkey");
-					}
-				}
 			}
+		}
+
+		boolean qlink = false;
+		for (linParams lin : keys) {
+			if (qlink)
+				condition = condition + " AND ";
+			String mityp = getMetaInfoType(lin.name);
+			if (mityp != null) {
+				switch (mityp) {
+				case "S":
+					if (lin.value != null)
+						condition = condition + " " + lin.name + " = '" + lin.value.trim() + "' ";
+					else
+						condition = condition + " " + lin.name + " = NULL ";
+					break;
+				case "E":
+					if (lin.value != null)
+						try {
+							condition = condition + " " + lin.name + " = '"
+									+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
+						} catch (Exception e) {
+							throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
+						}
+					else
+						condition = condition + " " + lin.name + " = NULL ";
+					break;
+				default:
+					condition = condition + " " + lin.name + " = " + lin.value.trim() + " ";
+					break;
+				}
+			} else {
+				condition = condition + " " + lin.name + " = " + lin.value.trim() + " ";
+			}
+			qlink = true;
 		}
 
 		// ++++++++++++++++++++++++++++++++++++++
