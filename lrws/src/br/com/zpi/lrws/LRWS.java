@@ -265,7 +265,7 @@ public class LRWS {
 							((JSONArray) jso.get(key)).length());
 					int cnob = 0;
 					for (Object xo : ao) {
-						ao[cnob] = Class.forName(clname).newInstance();
+						ao[cnob] = Class.forName(clname).getConstructors()[0].newInstance();
 						cnob++;
 					}
 					ao = json2ObjectA(ao, (JSONArray) jso.get(key), decode);
@@ -279,7 +279,7 @@ public class LRWS {
 					String clname = o.getClass().getDeclaredField(key).getType().getName();
 					if (clname.trim().indexOf("[") == 0)
 						clname = clname.substring(2, clname.length() - 1);
-					Object no = Class.forName(clname).newInstance();
+					Object no = Class.forName(clname).getConstructors()[0].newInstance();
 					no = json2Object(no, jso.getJSONObject(key), decode);
 					o.getClass().getDeclaredField(key).set(o, no);
 					if (o.getClass().getSuperclass() != null)
@@ -327,7 +327,7 @@ public class LRWS {
 				String clname = o.getClass().getName();
 				String clnameredux = clname.substring(2, clname.length() - 1);
 				if (o[i] == null)
-					o[i] = Class.forName(clnameredux).newInstance();
+					o[i] = Class.forName(clnameredux).getConstructors()[0].newInstance();
 				if (jsa.get(i).getClass().equals(jsa.getClass())) {
 					// is array
 					Object[] ao = json2ObjectA(o, jsa.getJSONArray(i), decode);

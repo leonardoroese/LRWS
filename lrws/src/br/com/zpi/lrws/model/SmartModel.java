@@ -32,6 +32,13 @@ public class SmartModel extends ConBase implements Serializable {
 	 * #####
 	 */
 
+	public SmartModel() {
+		super(null, 0);
+		this.targetDB = null;
+		this.sconf = null;
+		this.DBD = 0;
+	}
+	
 	public SmartModel(ServletConfig sconf, int DBD, String targetDB) {
 		super(sconf, DBD);
 		this.targetDB = targetDB;
@@ -46,6 +53,12 @@ public class SmartModel extends ConBase implements Serializable {
 	 * #####
 	 */
 
+	public void setSMConfig(ServletConfig sconf, int DBD, String targetDB){
+		this.targetDB = targetDB;
+		this.sconf = sconf;
+		this.DBD = DBD;
+	}
+	
 	public linParams[] getMetainfodb() {
 		return metainfodb;
 	}
