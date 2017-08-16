@@ -37,7 +37,7 @@ public abstract class ConBase {
 
 	public String lastval = null;
 	public String lastval_par = null;
-	
+
 	public ConBase(ServletConfig sconf) {
 		this.scontext = sconf;
 		this.DBD = 1;
@@ -69,7 +69,7 @@ public abstract class ConBase {
 		ServletContext ctx = this.scontext.getServletContext();
 		lastval = null;
 		boolean done = false;
-		
+
 		if (query == null || query.trim().length() <= 0) {
 			this.resType = "E";
 			this.resMsg = "Inform valid query";
@@ -97,9 +97,10 @@ public abstract class ConBase {
 			switch (DBD) {
 			case 1:
 				Class.forName(MYSQLDRIVER);
-				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
-						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname + "?allowMultiQueries=true", ctx.getInitParameter("dbUser"),
-						ctx.getInitParameter("dbPass"));
+				connection = (Connection) DriverManager.getConnection(
+						"jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":" + ctx.getInitParameter("dbPort") + "/"
+								+ dbname + "?allowMultiQueries=true",
+						ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
 				stmt = connection.createStatement();
 				done = stmt.execute(query);
 				break;
@@ -113,40 +114,41 @@ public abstract class ConBase {
 								ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
 				connection.setAutoCommit(true);
 				stmt = connection.createStatement();
-				try{
+				try {
 					stmt.executeQuery(query);
 					done = true;
-				}catch(SQLException e){
+				} catch (SQLException e) {
 
 				}
 				break;
 
 			default:
 				Class.forName(MYSQLDRIVER);
-				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
-						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname + "?allowMultiQueries=true", ctx.getInitParameter("dbUser"),
-						ctx.getInitParameter("dbPass"));
+				connection = (Connection) DriverManager.getConnection(
+						"jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":" + ctx.getInitParameter("dbPort") + "/"
+								+ dbname + "?allowMultiQueries=true",
+						ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
 				stmt = connection.createStatement();
 				done = stmt.execute(query);
 				break;
 
 			}
-			
-			if(stmt.getUpdateCount() > 0)
-				done  = true;
-			
+
+			if (stmt.getUpdateCount() > 0)
+				done = true;
+
 			rs = stmt.getResultSet();
-			if(rs == null)
-				if(stmt.getMoreResults())
+			if (rs == null)
+				if (stmt.getMoreResults())
 					rs = stmt.getResultSet();
-				
-			if (rs != null){
-				while(rs.next()){
-					if(lastval_par != null){
-						if(rs.getString(lastval_par) != null)
+
+			if (rs != null) {
+				while (rs.next()) {
+					if (lastval_par != null) {
+						if (rs.getString(lastval_par) != null)
 							lastval = rs.getString(lastval_par);
-					}else{
-						if(rs.getString("id") != null)
+					} else {
+						if (rs.getString("id") != null)
 							lastval = rs.getString("id");
 					}
 				}
@@ -158,18 +160,23 @@ public abstract class ConBase {
 			if (done) {
 				this.resType = "S";
 				this.resMsg = "Success";
-				return true;
 			} else {
 				this.resType = "E";
 				this.resMsg = "Not executed";
-				return false;
 			}
 
 		} catch (Exception e) {
 			this.resType = "E";
 			this.resMsg = e.getMessage();
-			return false;
 		}
+
+		try {
+			if (connection != null && !connection.isClosed())
+				connection.close();
+		} catch (Exception e) {
+
+		}
+		return done;
 	}
 
 	// ####################################################################
@@ -295,8 +302,16 @@ public abstract class ConBase {
 		} catch (Exception e) {
 			this.resType = "E";
 			this.resMsg = e.getMessage();
-			return null;
+
 		}
+		
+		try {
+			if (connection != null && !connection.isClosed())
+				connection.close();
+		} catch (Exception e) {
+
+		}
+		return null;
 	}
 
 	// ####################################################################
