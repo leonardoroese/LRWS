@@ -15,7 +15,18 @@ import org.json.JSONObject;
  * Created by leonardo on 19/12/15.
  */
 public class LRWS {
+	private String encoding = null;
+	
+	public LRWS(){
+		super();
+	}
+	
+	public LRWS(String encoding){
+		super();
+		this.encoding = encoding;
+	}
 
+	
 	private LRWSConverter converter = new LRWSConverter();
 
 	/*
@@ -172,7 +183,7 @@ public class LRWS {
 							val = (String) f.get(o);
 							if (val != null)
 								if (encoded)
-									jout.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
+									jout.put(f.getName(), URLEncoder.encode((String) f.get(o), encoding));
 								else
 									jout.put(f.getName(), f.get(o));
 							else if (!ignorenull)
@@ -218,7 +229,7 @@ public class LRWS {
 								val = (String) f.get(o);
 								if (val != null)
 									if (encoded)
-										jso.put(f.getName(), URLEncoder.encode((String) f.get(o), "UTF-8"));
+										jso.put(f.getName(), URLEncoder.encode((String) f.get(o), encoding));
 									else
 										jso.put(f.getName(), (String) f.get(o));
 								else
@@ -289,10 +300,10 @@ public class LRWS {
 					if (o.getClass().getDeclaredField(key) != null) {
 						if (decode) {
 							o.getClass().getDeclaredField(key).set(o,
-									URLDecoder.decode((String) jso.get(key).toString(), "UTF-8"));
+									URLDecoder.decode((String) jso.get(key).toString(), encoding));
 							if (o.getClass().getSuperclass() != null)
 								o.getClass().getSuperclass().getDeclaredField(key).set(o,
-										URLDecoder.decode((String) jso.get(key).toString(), "UTF-8"));
+										URLDecoder.decode((String) jso.get(key).toString(), encoding));
 						} else {
 							o.getClass().getDeclaredField(key).set(o, (String) jso.get(key).toString());
 							if (o.getClass().getSuperclass() != null)
