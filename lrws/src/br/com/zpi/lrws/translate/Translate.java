@@ -1,11 +1,14 @@
 package br.com.zpi.lrws.translate;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Translate {
-
+	private String encoding = "UTF-8";
+	
 	private ArrayList<String[]> msgs = new ArrayList<String[]>();
 
 	/*
@@ -14,11 +17,21 @@ public class Translate {
 	 * #########################################################################
 	 * #####
 	 */
+	public Translate(String filepath, String encoding) {
+		this.encoding = encoding;
+		loadfileT(filepath);
+	}
 	
 	public Translate(String filepath) {
+		loadfileT(filepath);
+	}
+
+	private void loadfileT(String filepath){
 		String[] mtz = null;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(filepath));
+			File file = new File(filepath);
+			BufferedReader br = new BufferedReader(
+				    new InputStreamReader(new FileInputStream(file),encoding));
 			String line;
 			while ((line = br.readLine()) != null) {
 				if (line != null && line.indexOf('=') >= 0) {
@@ -35,7 +48,6 @@ public class Translate {
 			msgs = null;
 		}
 	}
-
 	
 	/*
 	 * #########################################################################

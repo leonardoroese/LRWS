@@ -15,7 +15,7 @@ import org.json.JSONObject;
  * Created by leonardo on 19/12/15.
  */
 public class LRWS {
-	private String encoding = null;
+	private String encoding = "UTF-8";
 	
 	public LRWS(){
 		super();
