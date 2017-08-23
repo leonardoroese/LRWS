@@ -16,17 +16,16 @@ import org.json.JSONObject;
  */
 public class LRWS {
 	private String encoding = "UTF-8";
-	
-	public LRWS(){
+
+	public LRWS() {
 		super();
 	}
-	
-	public LRWS(String encoding){
+
+	public LRWS(String encoding) {
 		super();
 		this.encoding = encoding;
 	}
 
-	
 	private LRWSConverter converter = new LRWSConverter();
 
 	/*
@@ -210,7 +209,7 @@ public class LRWS {
 		JSONArray jout = new JSONArray();
 		for (Object o : ao) {
 			JSONObject jso = new JSONObject();
-			
+
 			// Get current class and superclass fields
 			Field[] ofields = null;
 			Field[] supfields = null;
@@ -313,24 +312,28 @@ public class LRWS {
 						clname = clname.substring(2, clname.length() - 1);
 					Object no = Class.forName(clname).getConstructors()[0].newInstance();
 					no = json2Object(no, jso.getJSONObject(key), decode);
-					o.getClass().getDeclaredField(key).set(o, no);
-					if (o.getClass().getSuperclass() != null)
-						o.getClass().getSuperclass().getDeclaredField(key).set(o, no);
+					Field df = null;
+					try {
+						df = o.getClass().getDeclaredField(key);
+					} catch (Exception ex) {
+						df = o.getClass().getSuperclass().getDeclaredField(key);
+					}
+					if (df != null) {
+						df.set(o, no);
+					}
 				} else {
 					// IS OTHER OBJECT (STRING)?
-					if (o.getClass().getDeclaredField(key) != null) {
-						if (decode) {
-							o.getClass().getDeclaredField(key).set(o,
-									URLDecoder.decode((String) jso.get(key).toString(), encoding));
-							if (o.getClass().getSuperclass() != null)
-								o.getClass().getSuperclass().getDeclaredField(key).set(o,
-										URLDecoder.decode((String) jso.get(key).toString(), encoding));
-						} else {
-							o.getClass().getDeclaredField(key).set(o, (String) jso.get(key).toString());
-							if (o.getClass().getSuperclass() != null)
-								o.getClass().getSuperclass().getDeclaredField(key).set(o,
-										(String) jso.get(key).toString());
-						}
+					Field df = null;
+					try {
+						df = o.getClass().getDeclaredField(key);
+					} catch (Exception ex) {
+						df = o.getClass().getSuperclass().getDeclaredField(key);
+					}
+					if (df != null) {
+						if (decode)
+							df.set(o, URLDecoder.decode((String) jso.get(key).toString(), encoding));
+						else
+							df.set(o, (String) jso.get(key).toString());
 					}
 				}
 			} catch (Exception e) {
