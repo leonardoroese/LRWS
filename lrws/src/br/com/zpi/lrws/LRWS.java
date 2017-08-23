@@ -210,7 +210,28 @@ public class LRWS {
 		JSONArray jout = new JSONArray();
 		for (Object o : ao) {
 			JSONObject jso = new JSONObject();
-			for (Field f : o.getClass().getDeclaredFields()) {
+			
+			// Get current class and superclass fields
+			Field[] ofields = null;
+			Field[] supfields = null;
+			Field[] allfields = null;
+			ofields = o.getClass().getDeclaredFields();
+			if (o.getClass().getSuperclass() != null) {
+				supfields = o.getClass().getSuperclass().getDeclaredFields();
+				allfields = new Field[ofields.length + supfields.length];
+				int c = 0;
+				for (Field f : ofields) {
+					allfields[c] = f;
+					c++;
+				}
+				for (Field f : supfields) {
+					allfields[c] = f;
+					c++;
+				}
+			} else {
+				allfields = ofields;
+			}
+			for (Field f : allfields) {
 				// Only public fields
 				if (Modifier.isPublic(f.getModifiers())) {
 					try {
