@@ -38,7 +38,7 @@ public class SmartModel extends ConBase implements Serializable {
 		this.sconf = null;
 		this.DBD = 0;
 	}
-	
+
 	public SmartModel(ServletConfig sconf, int DBD, String targetDB) {
 		super(sconf, DBD);
 		this.targetDB = targetDB;
@@ -53,12 +53,12 @@ public class SmartModel extends ConBase implements Serializable {
 	 * #####
 	 */
 
-	public void setSMConfig(ServletConfig sconf, int DBD, String targetDB){
+	public void setSMConfig(ServletConfig sconf, int DBD, String targetDB) {
 		this.targetDB = targetDB;
 		this.sconf = sconf;
 		this.DBD = DBD;
 	}
-	
+
 	public linParams[] getMetainfodb() {
 		return metainfodb;
 	}
@@ -89,59 +89,48 @@ public class SmartModel extends ConBase implements Serializable {
 		// PREPARE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
 		if (keys != null && keys.length > 0) {
-			for (Field f : this.getClass().getDeclaredFields()) {
-				if (!checkFieldExcluded(f.getName())) {
-					boolean qlink = false;
-					for (linParams lin : keys) {
-						String mityp = getMetaInfoType(f.getName());
-						if (lin.name != null
-								&& lin.name.trim().toUpperCase().equals(f.getName().trim().toUpperCase())) {
-							if (lin.value != null && lin.value.trim().length() > 0) {
-								if (qlink)
-									querywhere = querywhere + " AND ";
-								if (mityp != null) {
-									switch (mityp) {
-									case "S":
-										if (lin.value != null)
-											querywhere = querywhere + " " + f.getName() + " = '" + lin.value.trim()
-													+ "' ";
-										else
-											querywhere = querywhere + " " + f.getName() + " IS NULL ";
-										break;
-									case "E":
-										if (lin.value != null)
-											try {
-												querywhere = querywhere + " " + f.getName() + " = '"
-														+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
-											} catch (Exception e) {
-												throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
-											}
-										else
-											querywhere = querywhere + " " + f.getName() + " IS NULL ";
-										break;
-									default:
-										querywhere = querywhere + " " + f.getName() + " = " + lin.value.trim() + " ";
-										break;
-									}
-								} else {
-									if (lin.value != null)
-										querywhere = querywhere + " " + f.getName() + " = " + lin.value.trim() + " ";
-									else
-										querywhere = querywhere + " " + f.getName() + " IS NULL ";
+			boolean qlink = false;
+			for (linParams lin : keys) {
+				String mityp = getMetaInfoType(lin.name.trim());
+				if (!checkFieldExcluded(lin.name.trim()) && lin.name != null
+						&& lin.name.trim().toUpperCase().equals(lin.name.trim().toUpperCase())) {
+					if (qlink)
+						querywhere = querywhere + " AND ";
+					if (mityp != null) {
+						switch (mityp) {
+						case "S":
+							if (lin.value != null)
+								querywhere = querywhere + " " + lin.name.trim() + " = '" + lin.value.trim() + "' ";
+							else
+								querywhere = querywhere + " " + lin.name.trim() + " IS NULL ";
+							break;
+						case "E":
+							if (lin.value != null)
+								try {
+									querywhere = querywhere + " " + lin.name.trim() + " = '"
+											+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
+								} catch (Exception e) {
+									throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 								}
-								qlink = true;
-							} else {
-								throw new LRWSException("E", "LRWS", "lrws.e.modinvalidkey");
-							}
+							else
+								querywhere = querywhere + " " + lin.name.trim() + " IS NULL ";
+							break;
+						default:
+							querywhere = querywhere + " " + lin.name.trim() + " = " + lin.value.trim() + " ";
 							break;
 						}
+					} else {
+						if (lin.value != null)
+							querywhere = querywhere + " " + lin.name.trim() + " = " + lin.value.trim() + " ";
+						else
+							querywhere = querywhere + " " + lin.name.trim() + " IS NULL ";
 					}
+					qlink = true;
 				}
 			}
-			query = query + querywhere;
-			querycount = querycount + querywhere;
 		}
-
+		query = query + querywhere;
+		querycount = querycount + querywhere;
 		if (ord != null && ord.length > 0) {
 			queryend = queryend + " ORDER BY ";
 
@@ -161,10 +150,10 @@ public class SmartModel extends ConBase implements Serializable {
 				queryend = queryend + " LIMIT " + limit + " OFFSET " + (limit * page);
 				break;
 			case DBD_MYSQL:
-				queryend = queryend + " LIMIT " + page + " , " + limit;
+				queryend = queryend + " LIMIT " + (limit * page) + " , " + limit;
 				break;
 			default:
-				queryend = queryend + " LIMIT " + page + ", " + limit;
+				queryend = queryend + " LIMIT " + (limit * page) + ", " + limit;
 				break;
 			}
 		}
@@ -272,7 +261,7 @@ public class SmartModel extends ConBase implements Serializable {
 							query = query + " " + lin.name + " = " + lin.value.trim() + " ";
 							break;
 						}
-					}else{
+					} else {
 						query = query + " " + lin.name + " = " + lin.value.trim() + " ";
 					}
 					qlink = true;
