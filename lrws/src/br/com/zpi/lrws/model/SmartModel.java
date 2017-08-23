@@ -106,7 +106,7 @@ public class SmartModel extends ConBase implements Serializable {
 											querywhere = querywhere + " " + f.getName() + " = '" + lin.value.trim()
 													+ "' ";
 										else
-											querywhere = querywhere + " " + f.getName() + " = NULL ";
+											querywhere = querywhere + " " + f.getName() + " IS NULL ";
 										break;
 									case "E":
 										if (lin.value != null)
@@ -117,7 +117,7 @@ public class SmartModel extends ConBase implements Serializable {
 												throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 											}
 										else
-											querywhere = querywhere + " " + f.getName() + " = NULL ";
+											querywhere = querywhere + " " + f.getName() + " IS NULL ";
 										break;
 									default:
 										querywhere = querywhere + " " + f.getName() + " = " + lin.value.trim() + " ";
@@ -127,7 +127,7 @@ public class SmartModel extends ConBase implements Serializable {
 									if (lin.value != null)
 										querywhere = querywhere + " " + f.getName() + " = " + lin.value.trim() + " ";
 									else
-										querywhere = querywhere + " " + f.getName() + " = NULL ";
+										querywhere = querywhere + " " + f.getName() + " IS NULL ";
 								}
 								qlink = true;
 							} else {
@@ -255,7 +255,7 @@ public class SmartModel extends ConBase implements Serializable {
 							if (lin.value != null)
 								query = query + " " + lin.name + " = '" + lin.value.trim() + "' ";
 							else
-								query = query + " " + lin.name + " = NULL ";
+								query = query + " " + lin.name + " IS NULL ";
 							break;
 						case "E":
 							if (lin.value != null)
@@ -266,7 +266,7 @@ public class SmartModel extends ConBase implements Serializable {
 									throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 								}
 							else
-								query = query + " " + lin.name + " = NULL ";
+								query = query + " " + lin.name + " IS NULL ";
 							break;
 						default:
 							query = query + " " + lin.name + " = " + lin.value.trim() + " ";
@@ -492,7 +492,7 @@ public class SmartModel extends ConBase implements Serializable {
 								if (fval != null)
 									query = query + f.getName() + " = " + "'" + fval + "'";
 								else
-									query = query + f.getName() + " = " + "NULL";
+									query = query + f.getName() + " IS " + "NULL";
 								break;
 							case "E":
 								if (fval != null)
@@ -503,7 +503,7 @@ public class SmartModel extends ConBase implements Serializable {
 
 									}
 								else
-									query = query + f.getName() + " = " + "NULL";
+									query = query + f.getName() + " IS " + "NULL";
 								break;
 							default:
 								query = query + f.getName() + " = " + fval;
@@ -532,7 +532,7 @@ public class SmartModel extends ConBase implements Serializable {
 					if (lin.value != null)
 						condition = condition + " " + lin.name + " = '" + lin.value.trim() + "' ";
 					else
-						condition = condition + " " + lin.name + " = NULL ";
+						condition = condition + " " + lin.name + " IS NULL ";
 					break;
 				case "E":
 					if (lin.value != null)
@@ -543,7 +543,7 @@ public class SmartModel extends ConBase implements Serializable {
 							throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 						}
 					else
-						condition = condition + " " + lin.name + " = NULL ";
+						condition = condition + " " + lin.name + " IS NULL ";
 					break;
 				default:
 					condition = condition + " " + lin.name + " = " + lin.value.trim() + " ";
@@ -600,7 +600,7 @@ public class SmartModel extends ConBase implements Serializable {
 									if (lin.value != null)
 										query = query + " " + f.getName() + " = '" + lin.value.trim() + "' ";
 									else
-										query = query + " " + f.getName() + " = NULL ";
+										query = query + " " + f.getName() + " IS NULL ";
 									break;
 								case "E":
 									if (lin.value != null)
@@ -611,7 +611,7 @@ public class SmartModel extends ConBase implements Serializable {
 											throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 										}
 									else
-										query = query + " " + f.getName() + " = NULL ";
+										query = query + " " + f.getName() + " IS NULL ";
 									break;
 								default:
 									query = query + " " + f.getName() + " = " + lin.value.trim() + " ";
