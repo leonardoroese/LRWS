@@ -1,6 +1,10 @@
 package br.com.zpi.lrws.conn;
 
-public class DBLin {
+import java.io.Serializable;
+
+public class DBLin implements Serializable{
+	private static final long serialVersionUID = 1L;
+	
 	public int lin = 0;
 	public DBParVal[] cols = null;
 
