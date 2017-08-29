@@ -128,9 +128,10 @@ public class SmartModel extends ConBase implements Serializable {
 					qlink = true;
 				}
 			}
+			query = query + querywhere;
+			querycount = querycount + querywhere;
 		}
-		query = query + querywhere;
-		querycount = querycount + querywhere;
+
 		if (ord != null && ord.length > 0) {
 			queryend = queryend + " ORDER BY ";
 
