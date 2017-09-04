@@ -15,7 +15,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
@@ -38,6 +37,13 @@ public abstract class ConBase {
 	public String lastval = null;
 	public String lastval_par = null;
 
+	private static final String[][] cover_chars = {{"<","_lt_"},{">","_gt_"},{"=","_eq_"},{"\"","_quot_"},{"\'","_apos_"},{"\\&","_amp_"},{"\\$","_cur_"},{"\\?","_qmark_"}} ;
+	
+	// ####################################################################
+	// CONSTRUCTORS
+	// ####################################################################
+	
+	
 	public ConBase(ServletConfig sconf) {
 		this.scontext = sconf;
 		this.DBD = 1;
@@ -372,11 +378,13 @@ public abstract class ConBase {
 	// ####################################################################
 	// SQL VALIDATE
 	// ####################################################################
-	public String sqlValidate(String sqlquery, boolean nohtml) {
+	public String sqlValidate(String text, boolean nohtml) {
 		String outs = "";
 
 		if (nohtml)
-			outs = Jsoup.parse(sqlquery).text();
+			outs = Jsoup.parse(text).text();
+		else
+			outs = text;
 		/*
 		 * try{ outs = ESAPI.encoder().encodeForSQL(new
 		 * MySQLCodec(MySQLCodec.Mode.STANDARD), sqlquery); }catch(Exception
@@ -385,6 +393,46 @@ public abstract class ConBase {
 		return outs;
 	}
 
+	// ####################################################################
+	// SQL COVER
+	// ####################################################################
+	public static String sqlCover(String text, boolean nohtml) {
+		
+		if(text == null)
+			return null;
+		
+		String outs = "";
+
+		if (nohtml)
+			outs = Jsoup.parse(text).text();
+		else
+			outs = text;
+		
+		for(String [] ms : cover_chars) {
+			outs = outs.replaceAll(ms[0], ms[1]);
+		}
+
+		return outs;
+	}
+	
+	// ####################################################################
+	// SQL RECOVER
+	// ####################################################################
+	public static String sqlRecover(String text) {
+		if(text == null)
+			return null;
+		
+		String outs = text;
+		
+		for(String [] ms : cover_chars) {
+			outs = outs.replaceAll(ms[1], ms[0]);
+		}
+
+		
+		return outs;
+	}
+
+	
 	// ####################################################################
 	// HTTP-GET
 	// ####################################################################
