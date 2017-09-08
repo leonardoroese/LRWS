@@ -37,6 +37,8 @@ public class SmartModel extends ConBase implements Serializable {
 		this.targetDB = targetDB;
 		this.conf = conf;
 		this.DBD = DBD;
+		if(this.conf != null && this.conf.encoding == null)
+			this.conf.encoding = "UTF-8";
 	}
 	
 	/*
@@ -95,7 +97,7 @@ public class SmartModel extends ConBase implements Serializable {
 							if (lin.value != null)
 								try {
 									querywhere = querywhere + " " + lin.name.trim() + " = '"
-											+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
+											+ URLDecoder.decode(lin.value.trim(), conf.encoding) + "' ";
 								} catch (Exception e) {
 									throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 								}
@@ -175,7 +177,7 @@ public class SmartModel extends ConBase implements Serializable {
 								String mityp = getMetaInfoType(p.param);
 								if (mityp != null && mityp.trim().equals("E") && p.value != null) {
 									out[c].getClass().getDeclaredField(p.param).set(out[c],
-											URLDecoder.decode(p.value, "UTF-8"));
+											URLDecoder.decode(p.value, conf.encoding));
 								} else {
 									out[c].getClass().getDeclaredField(p.param).set(out[c], p.value);
 								}
@@ -238,7 +240,7 @@ public class SmartModel extends ConBase implements Serializable {
 							if (lin.value != null)
 								try {
 									query = query + " " + lin.name + " = '"
-											+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
+											+ URLDecoder.decode(lin.value.trim(), conf.encoding) + "' ";
 								} catch (Exception e) {
 									throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 								}
@@ -276,7 +278,7 @@ public class SmartModel extends ConBase implements Serializable {
 							String mityp = getMetaInfoType(p.param);
 							if (mityp != null && mityp.trim().equals("E") && p.value != null) {
 								this.getClass().getDeclaredField(p.param).set(this,
-										URLDecoder.decode(p.value, "UTF-8"));
+										URLDecoder.decode(p.value, conf.encoding));
 							} else {
 								this.getClass().getDeclaredField(p.param).set(this, p.value);
 							}
@@ -349,7 +351,7 @@ public class SmartModel extends ConBase implements Serializable {
 												qvalues = qvalues + ", ";
 											}
 											qfields = qfields + f.getName();
-											qvalues = qvalues + "'" + URLEncoder.encode(fval, "UTF-8") + "'";
+											qvalues = qvalues + "'" + URLEncoder.encode(fval, conf.encoding) + "'";
 											qset = true;
 										} catch (Exception e) {
 
@@ -474,7 +476,7 @@ public class SmartModel extends ConBase implements Serializable {
 							case "E":
 								if (fval != null)
 									try {
-										query = query + f.getName() + " = " + "'" + URLEncoder.encode(fval, "UTF-8")
+										query = query + f.getName() + " = " + "'" + URLEncoder.encode(fval, conf.encoding)
 												+ "'";
 									} catch (Exception e) {
 
@@ -515,7 +517,7 @@ public class SmartModel extends ConBase implements Serializable {
 					if (lin.value != null)
 						try {
 							condition = condition + " " + lin.name + " = '"
-									+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
+									+ URLDecoder.decode(lin.value.trim(), conf.encoding) + "' ";
 						} catch (Exception e) {
 							throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 						}
@@ -583,7 +585,7 @@ public class SmartModel extends ConBase implements Serializable {
 									if (lin.value != null)
 										try {
 											query = query + " " + f.getName() + " = '"
-													+ URLDecoder.decode(lin.value.trim(), "UTF-8") + "' ";
+													+ URLDecoder.decode(lin.value.trim(), conf.encoding) + "' ";
 										} catch (Exception e) {
 											throw new LRWSException("E", "LRWS", "lrws.e.modencodingpar");
 										}

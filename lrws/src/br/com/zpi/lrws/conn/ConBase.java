@@ -43,11 +43,15 @@ public abstract class ConBase {
 	public ConBase(Configurations conf) {
 		this.conf = conf;
 		this.DBD = 1;
+		if(this.conf != null && this.conf.encoding == null)
+			this.conf.encoding = "UTF-8";
 	}
 
 	public ConBase(Configurations conf, int DBD) {
 		this.conf = conf;
 		this.DBD = DBD;
+		if(this.conf != null && this.conf.encoding == null)
+			this.conf.encoding = "UTF-8";
 	}
 
 	// ####################################################################
@@ -81,7 +85,7 @@ public abstract class ConBase {
 				for (String s : params) {
 					if (encode) {
 						try {
-							s = URLEncoder.encode(s, "UTF-8");
+							s = URLEncoder.encode(s, conf.encoding);
 						} catch (Exception e) {
 
 						}
@@ -202,7 +206,7 @@ public abstract class ConBase {
 				for (String s : params) {
 					if (encode) {
 						try {
-							s = URLEncoder.encode(s, "UTF-8");
+							s = URLEncoder.encode(s, conf.encoding);
 						} catch (Exception e) {
 
 						}
