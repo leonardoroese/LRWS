@@ -8,6 +8,7 @@ public class Configurations {
 	public String dbPass = null;
 	public String mailHost = null;
 	public String mailFrom = null;
+	public String mailFromName = null;
 	public String mailAuth = null;
 	public String mailPort = null;
 	public String mailTLS = null;
