@@ -14,41 +14,40 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 import br.com.zpi.lrws.conn.ConBase;
+import br.com.zpi.lrws.conn.Configurations;
 
 public class Mail extends ConBase {
-	private ServletConfig scontext = null;
+	private Configurations conf = null;
 
-	public Mail(ServletConfig sconf) {
-		super(sconf);
-		this.scontext = sconf;
+	public Mail(Configurations conf) {
+		super(conf);
+		this.conf = conf;
 	}
 
 	public boolean sendMail(String to, String subj, String msg) {
-		ServletContext ctx = this.scontext.getServletContext();
-
 		Properties props = new Properties();
-		props.put("mail.smtp.host", ctx.getInitParameter("mailHost"));
-		props.put("mail.smtp.auth", ctx.getInitParameter("mailAuth"));
-		props.put("mail.smtp.port", ctx.getInitParameter("mailPort"));
-		props.put("mail.smtp.socketFactory.port", ctx.getInitParameter("mailPort"));
-		props.put("mail.transport.protocol", "smtp");
-		props.put("mail.smtp.starttls.enable", ctx.getInitParameter("mailTLS"));
-		if(ctx.getInitParameter("mailSSL") != null && ctx.getInitParameter("mailSSL").trim().toUpperCase().equals("TRUE")){
-			props.put("mail.smtp.ssl.enable", ctx.getInitParameter("mailSSL"));
+		props.put("mail.smtp.host", conf.mailHost);
+		props.put("mail.smtp.auth", conf.mailAuth);
+		props.put("mail.smtp.port", conf.mailPort);
+		props.put("mail.smtp.socketFactory.port", conf.mailPort);
+		props.put("mail.smtp.starttls.enable", conf.mailTLS);
+		if(conf.mailSSL != null && conf.mailSSL.trim().toUpperCase().equals("TRUE")){
+			props.put("mail.smtp.ssl.enable", conf.mailSSL);
+			props.put("mail.transport.protocol", "smtps");
 			props.put("mail.smtps.ssl.checkserveridentity", "false");
 			props.put("mail.smtps.ssl.trust", "*");
 			props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		}else{
-			
+			props.put("mail.transport.protocol", "smtp");
 		}
-		props.put("mail.smtp.user", ctx.getInitParameter("mailFrom"));
+		props.put("mail.smtp.user", conf.mailFrom);
 		props.put("mail.smtp.socketFactory.fallback", "false");
 		// props.put("mail.debug", "true");
 
 		Session session = null;
-		if(ctx.getInitParameter("mailAuth") != null && ctx.getInitParameter("mailAuth").trim().toUpperCase().equals("TRUE")){
+		if(conf.mailAuth != null && conf.mailAuth.trim().toUpperCase().equals("TRUE")){
 			SimpleAuth auth = null;
-			auth = new SimpleAuth(ctx.getInitParameter("mailUser"), ctx.getInitParameter("mailPass"));
+			auth = new SimpleAuth(conf.mailUser, conf.mailPass);
 			session = Session.getInstance(props, auth);
 		}else{
 			session = Session.getInstance(props);
@@ -56,7 +55,7 @@ public class Mail extends ConBase {
 		try {
 
 			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(ctx.getInitParameter("mailFrom")));
+			message.setFrom(new InternetAddress(conf.mailFrom));
 
 			Address[] toUser = InternetAddress.parse(to);
 			message.setRecipients(Message.RecipientType.TO, toUser);

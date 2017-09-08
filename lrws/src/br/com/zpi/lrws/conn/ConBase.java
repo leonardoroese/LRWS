@@ -25,32 +25,28 @@ public abstract class ConBase {
 	public String resType = null;
 	public String resMsg = null;
 	private int DBD = 1;
-
-	private ServletConfig scontext = null;
-
+	private Configurations conf = null;
 	private static final String MYSQLDRIVER = "com.mysql.jdbc.Driver";
 	private static final String POSTGRESQLDRIVER = "org.postgresql.Driver";
-
 	public static final int DBD_MYSQL = 1;
 	public static final int DBD_POSTGRESQL = 2;
-
 	public String lastval = null;
 	public String lastval_par = null;
 
-	private static final String[][] cover_chars = {{"<","_lt_"},{">","_gt_"},{"=","_eq_"},{"\"","_quot_"},{"\'","_apos_"},{"\\&","_amp_"},{"\\$","_cur_"},{"\\?","_qmark_"}} ;
-	
+	private static final String[][] cover_chars = { { "<", "_lt_" }, { ">", "_gt_" }, { "=", "_eq_" },
+			{ "\"", "_quot_" }, { "\'", "_apos_" }, { "\\&", "_amp_" }, { "\\$", "_cur_" }, { "\\?", "_qmark_" } };
+
 	// ####################################################################
 	// CONSTRUCTORS
 	// ####################################################################
-	
-	
-	public ConBase(ServletConfig sconf) {
-		this.scontext = sconf;
+
+	public ConBase(Configurations conf) {
+		this.conf = conf;
 		this.DBD = 1;
 	}
 
-	public ConBase(ServletConfig sconf, int DBD) {
-		this.scontext = sconf;
+	public ConBase(Configurations conf, int DBD) {
+		this.conf = conf;
 		this.DBD = DBD;
 	}
 
@@ -72,7 +68,6 @@ public abstract class ConBase {
 	public boolean updateDB(String query, String dbname, String[] params, boolean encode) {
 		Connection connection = null;
 		ResultSet rs = null;
-		ServletContext ctx = this.scontext.getServletContext();
 		lastval = null;
 		boolean done = false;
 
@@ -97,27 +92,24 @@ public abstract class ConBase {
 		}
 
 		if (dbname == null)
-			dbname = ctx.getInitParameter("dbName");
+			dbname = conf.dbName;
 		try {
 			Statement stmt = null;
 			switch (DBD) {
 			case 1:
 				Class.forName(MYSQLDRIVER);
 				connection = (Connection) DriverManager.getConnection(
-						"jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":" + ctx.getInitParameter("dbPort") + "/"
-								+ dbname + "?allowMultiQueries=true",
-						ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
+						"jdbc:mysql://" + conf.dbHost + ":" + conf.dbPort + "/" + dbname + "?allowMultiQueries=true",
+						conf.dbUser, conf.dbPass);
 				stmt = connection.createStatement();
 				done = stmt.execute(query);
 				break;
 
 			case 2:
 				Class.forName(POSTGRESQLDRIVER);
-				connection = (Connection) DriverManager
-						.getConnection(
-								"jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
-										+ ctx.getInitParameter("dbPort") + "/" + dbname,
-								ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
+				connection = (Connection) DriverManager.getConnection(
+						"jdbc:postgresql://" + conf.dbHost + ":" + conf.dbPort + "/" + dbname, conf.dbUser,
+						conf.dbPass);
 				connection.setAutoCommit(true);
 				stmt = connection.createStatement();
 				try {
@@ -131,9 +123,8 @@ public abstract class ConBase {
 			default:
 				Class.forName(MYSQLDRIVER);
 				connection = (Connection) DriverManager.getConnection(
-						"jdbc:mysql://" + ctx.getInitParameter("dbHost") + ":" + ctx.getInitParameter("dbPort") + "/"
-								+ dbname + "?allowMultiQueries=true",
-						ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
+						"jdbc:mysql://" + conf.dbHost + ":" + conf.dbPort + "/" + dbname + "?allowMultiQueries=true",
+						conf.dbUser, conf.dbPass);
 				stmt = connection.createStatement();
 				done = stmt.execute(query);
 				break;
@@ -198,7 +189,6 @@ public abstract class ConBase {
 
 	public ArrayList<DBLin> readDb(String query, String dbname, String[] params, boolean encode) {
 		Connection connection = null;
-		ServletContext ctx = this.scontext.getServletContext();
 		ResultSet rs = null;
 		ArrayList<DBLin> outres = null;
 
@@ -223,31 +213,27 @@ public abstract class ConBase {
 		}
 
 		if (dbname == null)
-			dbname = ctx.getInitParameter("dbName");
+			dbname = conf.dbName;
 		try {
 
 			switch (DBD) {
 			case 1:
 				Class.forName(MYSQLDRIVER);
-				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
-						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-						ctx.getInitParameter("dbPass"));
+				connection = (Connection) DriverManager.getConnection(
+						"jdbc:mysql://" + conf.dbHost + ":" + conf.dbPort + "/" + dbname, conf.dbUser, conf.dbPass);
 				break;
 
 			case 2:
 				Class.forName(POSTGRESQLDRIVER);
-				connection = (Connection) DriverManager
-						.getConnection(
-								"jdbc:postgresql://" + ctx.getInitParameter("dbHost") + ":"
-										+ ctx.getInitParameter("dbPort") + "/" + dbname,
-								ctx.getInitParameter("dbUser"), ctx.getInitParameter("dbPass"));
+				connection = (Connection) DriverManager.getConnection(
+						"jdbc:postgresql://" + conf.dbHost + ":" + conf.dbPort + "/" + dbname, conf.dbUser,
+						conf.dbPass);
 				break;
 
 			default:
 				Class.forName(MYSQLDRIVER);
-				connection = (Connection) DriverManager.getConnection("jdbc:mysql://" + ctx.getInitParameter("dbHost")
-						+ ":" + ctx.getInitParameter("dbPort") + "/" + dbname, ctx.getInitParameter("dbUser"),
-						ctx.getInitParameter("dbPass"));
+				connection = (Connection) DriverManager.getConnection(
+						"jdbc:mysql://" + conf.dbHost + ":" + conf.dbPort + "/" + dbname, conf.dbUser, conf.dbPass);
 				break;
 
 			}
@@ -310,7 +296,7 @@ public abstract class ConBase {
 			this.resMsg = e.getMessage();
 
 		}
-		
+
 		try {
 			if (connection != null && !connection.isClosed())
 				connection.close();
@@ -387,8 +373,8 @@ public abstract class ConBase {
 			outs = text;
 		/*
 		 * try{ outs = ESAPI.encoder().encodeForSQL(new
-		 * MySQLCodec(MySQLCodec.Mode.STANDARD), sqlquery); }catch(Exception
-		 * ex){ return null; }
+		 * MySQLCodec(MySQLCodec.Mode.STANDARD), sqlquery); }catch(Exception ex){ return
+		 * null; }
 		 */
 		return outs;
 	}
@@ -397,42 +383,40 @@ public abstract class ConBase {
 	// SQL COVER
 	// ####################################################################
 	public static String sqlCover(String text, boolean nohtml) {
-		
-		if(text == null)
+
+		if (text == null)
 			return null;
-		
+
 		String outs = "";
 
 		if (nohtml)
 			outs = Jsoup.parse(text).text();
 		else
 			outs = text;
-		
-		for(String [] ms : cover_chars) {
+
+		for (String[] ms : cover_chars) {
 			outs = outs.replaceAll(ms[0], ms[1]);
 		}
 
 		return outs;
 	}
-	
+
 	// ####################################################################
 	// SQL RECOVER
 	// ####################################################################
 	public static String sqlRecover(String text) {
-		if(text == null)
+		if (text == null)
 			return null;
-		
+
 		String outs = text;
-		
-		for(String [] ms : cover_chars) {
+
+		for (String[] ms : cover_chars) {
 			outs = outs.replaceAll(ms[1], ms[0]);
 		}
 
-		
 		return outs;
 	}
 
-	
 	// ####################################################################
 	// HTTP-GET
 	// ####################################################################

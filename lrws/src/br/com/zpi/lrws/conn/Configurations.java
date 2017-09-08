@@ -6,4 +6,13 @@ public class Configurations {
 	public String dbName = null;
 	public String dbUser = null;
 	public String dbPass = null;
+	public String mailHost = null;
+	public String mailFrom = null;
+	public String mailAuth = null;
+	public String mailPort = null;
+	public String mailTLS = null;
+	public String mailSSL = null;
+	public String mailUser = null;
+	public String mailPass = null;
+	public String encoding = null;
 }

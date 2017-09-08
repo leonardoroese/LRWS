@@ -7,17 +7,17 @@ import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import javax.servlet.ServletConfig;
 import br.com.zpi.lrws.LRWSException;
 import br.com.zpi.lrws.linParams;
 import br.com.zpi.lrws.conn.ConBase;
+import br.com.zpi.lrws.conn.Configurations;
 import br.com.zpi.lrws.conn.DBLin;
 import br.com.zpi.lrws.conn.DBParVal;
 
 public class SmartModel extends ConBase implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String targetDB = null;
-	private ServletConfig sconf = null;
+	private Configurations conf = null;
 	private int DBD = 0;
 	private linParams[] metainfodb = null;
 	/*
@@ -32,32 +32,19 @@ public class SmartModel extends ConBase implements Serializable {
 	 * #####
 	 */
 
-	public SmartModel() {
-		super(null, 0);
-		this.targetDB = null;
-		this.sconf = null;
-		this.DBD = 0;
-	}
-
-	public SmartModel(ServletConfig sconf, int DBD, String targetDB) {
-		super(sconf, DBD);
+	public SmartModel(Configurations conf, int DBD, String targetDB) {
+		super(conf, DBD);
 		this.targetDB = targetDB;
-		this.sconf = sconf;
+		this.conf = conf;
 		this.DBD = DBD;
 	}
-
+	
 	/*
 	 * #########################################################################
 	 * ##### GETTERS SETTERS
 	 * #########################################################################
 	 * #####
 	 */
-
-	public void setSMConfig(ServletConfig sconf, int DBD, String targetDB) {
-		this.targetDB = targetDB;
-		this.sconf = sconf;
-		this.DBD = DBD;
-	}
 
 	public linParams[] getMetainfodb() {
 		return metainfodb;
@@ -180,8 +167,8 @@ public class SmartModel extends ConBase implements Serializable {
 			for (DBLin lin : al) {
 				try {
 					Class<?> clazz = Class.forName(this.getClass().getName());
-					Constructor<?> ctor = clazz.getConstructor(ServletConfig.class, int.class, String.class);
-					out[c] = ctor.newInstance(new Object[] { sconf, DBD, targetDB });
+					Constructor<?> ctor = clazz.getConstructor(Configurations.class, int.class, String.class);
+					out[c] = ctor.newInstance(new Object[] { conf, DBD, targetDB });
 					for (DBParVal p : lin.cols) {
 						try {
 							if (p.value != null) {
