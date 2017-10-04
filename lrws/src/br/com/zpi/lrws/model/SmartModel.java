@@ -258,7 +258,6 @@ public class SmartModel extends ConBase implements Serializable {
 				} else {
 					throw new LRWSException("E", "LRWS", "lrws.e.modinvalidkey");
 				}
-				break;
 			}
 		}
 		// ++++++++++++++++++++++++++++++++++++++
