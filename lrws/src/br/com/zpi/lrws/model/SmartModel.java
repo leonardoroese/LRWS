@@ -37,10 +37,10 @@ public class SmartModel extends ConBase implements Serializable {
 		this.targetDB = targetDB;
 		this.conf = conf;
 		this.DBD = DBD;
-		if(this.conf != null && this.conf.encoding == null)
+		if (this.conf != null && this.conf.encoding == null)
 			this.conf.encoding = "UTF-8";
 	}
-	
+
 	/*
 	 * #########################################################################
 	 * ##### GETTERS SETTERS
@@ -305,7 +305,7 @@ public class SmartModel extends ConBase implements Serializable {
 
 	public String createMe(String ai) throws LRWSException {
 
-		String query = "INSERT " + targetDB + " ";
+		String query = "INSERT INTO " + targetDB + " ";
 		String qfields = "";
 		String qvalues = "";
 		boolean qset = false;
@@ -407,9 +407,17 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		// EXECUTE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
-		if (ai != null)
+		if (ai != null) {
 			lastval_par = ai;
-
+			switch (DBD) {
+			case ConBase.DBD_MYSQL:
+				query = query + "; SELECT last_insert_id() as " + lastval_par;
+				break;
+			case ConBase.DBD_POSTGRESQL:
+				query = query + " RETURNING " + lastval_par;
+				break;
+			}
+		}
 		boolean res = updateDB(query);
 
 		// ++++++++++++++++++++++++++++++++++++++
@@ -475,8 +483,8 @@ public class SmartModel extends ConBase implements Serializable {
 							case "E":
 								if (fval != null)
 									try {
-										query = query + f.getName() + " = " + "'" + URLEncoder.encode(fval, conf.encoding)
-												+ "'";
+										query = query + f.getName() + " = " + "'"
+												+ URLEncoder.encode(fval, conf.encoding) + "'";
 									} catch (Exception e) {
 
 									}
