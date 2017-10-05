@@ -1,6 +1,7 @@
 package br.com.zpi.lrws;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URLDecoder;
@@ -296,7 +297,12 @@ public class LRWS {
 							((JSONArray) jso.get(key)).length());
 					int cnob = 0;
 					for (Object xo : ao) {
-						ao[cnob] = Class.forName(clname).getConstructors()[0].newInstance();
+						for (Constructor<?> constr : Class.forName(clname).getConstructors()) {
+							if(constr.getParameterCount() == 0) {
+								ao[cnob] = constr.newInstance();
+								break;
+							}
+						}
 						cnob++;
 					}
 					ao = json2ObjectA(ao, (JSONArray) jso.get(key), decode);
@@ -361,8 +367,14 @@ public class LRWS {
 			try {
 				String clname = o.getClass().getName();
 				String clnameredux = clname.substring(2, clname.length() - 1);
-				if (o[i] == null)
-					o[i] = Class.forName(clnameredux).getConstructors()[0].newInstance();
+				if (o[i] == null) {
+					for (Constructor<?> constr : Class.forName(clnameredux).getConstructors()) {
+						if(constr.getParameterCount() == 0) {
+							o[i] = constr.newInstance();
+							break;
+						}
+					}
+				}
 				if (jsa.get(i).getClass().equals(jsa.getClass())) {
 					// is array
 					Object[] ao = json2ObjectA(o, jsa.getJSONArray(i), decode);
