@@ -478,7 +478,7 @@ public class SmartModel extends ConBase implements Serializable {
 								if (fval != null)
 									query = query + f.getName() + " = " + "'" + fval + "'";
 								else
-									query = query + f.getName() + " IS " + "NULL";
+									query = query + f.getName() + " = " + "NULL";
 								break;
 							case "E":
 								if (fval != null)
@@ -489,7 +489,7 @@ public class SmartModel extends ConBase implements Serializable {
 
 									}
 								else
-									query = query + f.getName() + " IS " + "NULL";
+									query = query + f.getName() + " = " + "NULL";
 								break;
 							default:
 								query = query + f.getName() + " = " + fval;
