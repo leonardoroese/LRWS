@@ -263,6 +263,7 @@ public class SmartModel extends ConBase implements Serializable {
 		// ++++++++++++++++++++++++++++++++++++++
 		// EXECUTE QUERY
 		// ++++++++++++++++++++++++++++++++++++++
+		query = query + " LIMIT 1";
 		ArrayList<DBLin> al = readDb(query);
 
 		// ++++++++++++++++++++++++++++++++++++++
