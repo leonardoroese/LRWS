@@ -17,7 +17,6 @@ import br.com.zpi.lrws.conn.Configurations;
 public class LRWSServlet extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	private LRWSBodyRequest bodyreq = null;
-	public LRWSEndpointMap epmap = null;
 	public LRWS lrws = null;
 	public JSONObject jsonBody = null;
 	public JSONArray jsonBodyA = null;
@@ -59,9 +58,6 @@ public class LRWSServlet extends HttpServlet{
 		
 		if(getServletContext().getInitParameter("encoding") != null)
 			encoding = getServletContext().getInitParameter("encoding").toString();
-		
-		if(getServletContext().getInitParameter("LRWSSERVLETMAP") != null)
-			epmap = new LRWSEndpointMap(getServletContext().getInitParameter("LRWSSERVLETMAP").toString());
 		
 		lrws = new LRWS(encoding);
 
@@ -106,7 +102,6 @@ public class LRWSServlet extends HttpServlet{
 		jsonBodyA = null;
 		jsonPars = null;
 		address = null;
-		epmap = null;
 	}
 	
 }
