@@ -21,6 +21,7 @@ public class LRWSServlet extends HttpServlet{
 	public JSONArray jsonBodyA = null;
 	public JSONObject jsonPars = null;
 	public String address = null;
+	public String endpoint = null;
 	public PrintWriter out = null;
 	
 	
@@ -73,6 +74,12 @@ public class LRWSServlet extends HttpServlet{
 		if (address.startsWith(req.getContextPath())) {
 			address = address.substring(req.getContextPath().length());
 		}
+		
+		endpoint = address;
+		if (endpoint.indexOf("?") >= 0)
+			endpoint = endpoint.substring(0, endpoint.indexOf("?"));
+		if (endpoint != null && endpoint.startsWith("/"))
+			endpoint = endpoint.substring(1);
 
 	}
 

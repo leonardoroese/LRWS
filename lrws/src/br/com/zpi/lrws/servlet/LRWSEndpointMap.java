@@ -15,7 +15,7 @@ public abstract class LRWSEndpointMap {
 	public String getServletReceiver(String endpoint) {
 		if(map != null) {
 			for(linParams p : map) {
-				if(p.name.toUpperCase().trim().startsWith(endpoint))
+				if(p.name.toUpperCase().trim().equals(endpoint))
 					return p.value;
 			}
 		}

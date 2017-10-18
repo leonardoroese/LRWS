@@ -36,7 +36,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 			return;
 		}
 		// MAP
-		String serv = epmap.getServletReceiver(address);
+		String serv = epmap.getServletReceiver(endpoint);
 		if (serv != null) {
 			try {
 				LRWSServlet servlet = (LRWSServlet) Class.forName(serv).newInstance();
@@ -77,7 +77,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 			return;
 		}
 		// MAP
-		String serv = epmap.getServletReceiver(address);
+		String serv = epmap.getServletReceiver(endpoint);
 		if (serv != null) {
 			try {
 				LRWSServlet servlet = (LRWSServlet) Class.forName(serv).newInstance();
@@ -117,7 +117,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 			return;
 		}
 		// MAP
-		String serv = epmap.getServletReceiver(address);
+		String serv = epmap.getServletReceiver(endpoint);
 		if (serv != null) {
 			try {
 				LRWSServlet servlet = (LRWSServlet) Class.forName(serv).newInstance();
@@ -159,7 +159,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 			return;
 		}
 		// MAP
-		String serv = epmap.getServletReceiver(address);
+		String serv = epmap.getServletReceiver(endpoint);
 		if (serv != null) {
 			try {
 				LRWSServlet servlet = (LRWSServlet) Class.forName(serv).newInstance();
