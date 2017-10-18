@@ -1,22 +1,28 @@
 package br.com.zpi.lrws.servlet;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.util.ArrayList;
-
-import br.com.zpi.lrws.linParams;
-
-public abstract class LRWSEndpointMap {
+public class LRWSEndpointMap {
 	
-	public ArrayList<linParams> map = null;
+	public JSONArray map = null;
 	
-	public LRWSEndpointMap() {
-		
+	public LRWSEndpointMap(String jsonmap) {
+		try {
+			map = new JSONArray(jsonmap);
+		}catch(Exception e) {
+			
+		}
 	}
 	
 	public String getServletReceiver(String endpoint) {
 		if(map != null) {
-			for(linParams p : map) {
-				if(p.name.toUpperCase().trim().equals(endpoint))
-					return p.value;
+			for(int i = 0; i < map.length(); i++) {
+				JSONObject jo = map.getJSONObject(i);
+				if(jo.has("endpoint") && jo.has("servlet")) {
+					if(jo.getString("endpoint").toUpperCase().trim().equals(endpoint.trim().toUpperCase())) {
+						return jo.getString("servlet");
+					}
+				}
 			}
 		}
 		return null;
