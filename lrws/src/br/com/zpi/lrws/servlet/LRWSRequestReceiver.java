@@ -5,6 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import br.com.zpi.lrws.LRWSException;
+import br.com.zpi.lrws.conn.Configurations;
 
 public class LRWSRequestReceiver extends LRWSServlet {
 	private static final long serialVersionUID = 1L;
@@ -20,7 +21,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		super.doDelete(req, resp);
 		
-		String smap = getServletContext().getAttribute("LRWSServletMapping").toString();
+		String smap = getServletContext().getInitParameter("LRWSServletMapping").toString();
 		if (smap != null) {
 			try {
 				epmap = (LRWSEndpointMap) Class.forName(smap).newInstance();
@@ -61,7 +62,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		super.doGet(req, resp);
 
-		String smap = getServletContext().getAttribute("LRWSServletMapping").toString();
+		String smap = getServletContext().getInitParameter("LRWSServletMapping").toString();
 		if (smap != null) {
 			try {
 				epmap = (LRWSEndpointMap) Class.forName(smap).newInstance();
@@ -102,7 +103,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		super.doPost(req, resp);
 		
-		String smap = getServletContext().getAttribute("LRWSServletMapping").toString();
+		String smap = getServletContext().getInitParameter("LRWSServletMapping").toString();
 		if (smap != null) {
 			try {
 				epmap = (LRWSEndpointMap) Class.forName(smap).newInstance();
@@ -143,7 +144,7 @@ public class LRWSRequestReceiver extends LRWSServlet {
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		super.doPut(req, resp);
 		
-		String smap = getServletContext().getAttribute("LRWSServletMapping").toString();
+		String smap = getServletContext().getInitParameter("LRWSServletMapping").toString();
 		if (smap != null) {
 			try {
 				epmap = (LRWSEndpointMap) Class.forName(smap).newInstance();

@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import br.com.zpi.lrws.LRWS;
+import br.com.zpi.lrws.conn.Configurations;
 
 public class LRWSServlet extends HttpServlet{
 	private static final long serialVersionUID = 1L;
@@ -23,7 +24,8 @@ public class LRWSServlet extends HttpServlet{
 	public String address = null;
 	public String endpoint = null;
 	public PrintWriter out = null;
-	
+	public Configurations conf = null;
+	public String encoding = "UTF-8";
 	
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -53,8 +55,10 @@ public class LRWSServlet extends HttpServlet{
 	 */
 	private void initialize(HttpServletRequest req, HttpServletResponse resp) {
 		clear();
-
-		String encoding = getServletContext().getAttribute("encoding").toString();
+		
+		if(getServletContext().getInitParameter("encoding") != null)
+			encoding = getServletContext().getInitParameter("encoding").toString();
+		
 		lrws = new LRWS(encoding);
 
 		try {
@@ -62,7 +66,7 @@ public class LRWSServlet extends HttpServlet{
 		} catch (Exception e) {
 
 		}
-
+		address = req.getRequestURI();
 		bodyreq = new LRWSBodyRequest(req, encoding);
 
 		if (bodyreq != null) {
