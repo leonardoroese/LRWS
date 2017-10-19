@@ -23,6 +23,7 @@ public class LRWSServlet extends HttpServlet{
 	public JSONObject jsonPars = null;
 	public String address = null;
 	public String endpoint = null;
+	public String lastpoint = null;
 	public PrintWriter out = null;
 	public Configurations conf = null;
 	public String encoding = "UTF-8";
@@ -85,6 +86,10 @@ public class LRWSServlet extends HttpServlet{
 		if (endpoint != null && endpoint.startsWith("/"))
 			endpoint = endpoint.substring(1);
 
+		lastpoint = endpoint;
+		if(lastpoint.indexOf("/") > 0)
+			lastpoint = endpoint.substring(lastpoint.lastIndexOf("/"), lastpoint.length());
+		
 	}
 
 	/*
@@ -102,6 +107,8 @@ public class LRWSServlet extends HttpServlet{
 		jsonBodyA = null;
 		jsonPars = null;
 		address = null;
+		lastpoint = null;
+		endpoint = null;
 	}
 	
 }
